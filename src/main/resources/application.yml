@@ -1,0 +1,35 @@
+server:
+  port: 8099 # 서버 포트 설정
+spring:
+  application:
+    name: mallapi # 애플리케이션 이름 설정
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver # MariaDB JDBC 드라이버 클래스 이름
+    url: jdbc:mariadb://localhost:3306/mymall?useUnicode=true&characterEncoding=utf8 # MariaDB 데이터베이스 URL (UTF-8 인코딩 설정 추가)
+    username: myuser # 데이터베이스 사용자 이름
+    password: 1234 # 데이터베이스 비밀번호
+
+  jpa:
+    hibernate: # JPA Hibernate 설정
+      ddl-auto: update # DDL (Data Definition Language) 자동 생성/업데이트 모드 (update: 변경 사항만 반영)
+    show-sql: true
+    generate-ddl: true # DDL 생성 활성화 (필요한 경우)
+    properties:
+      hibernate: # Hibernate 추가 속성
+        format_sql: true # SQL 쿼리 포맷팅 활성화
+        hibernate: org.hibernate.dialect.MariaDBDialect # MariaDB 방언 설정
+
+logging:
+  level:
+    org:
+      springframework: info
+    jakarta: #jakarta 로깅 추가
+      persistence: trace
+      security:   # Spring Security 관련된 로그
+        web: info
+    com:
+      spring:
+        jpa: debug
+    example:
+      mallapi:
+        test: info

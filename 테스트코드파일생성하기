@@ -1,0 +1,8 @@
+
+0) 테스트 코드 작성할 소스 Open
+1) 테스트 원하는 클래스나 메서드에 커서 위치해 두고 vscode 에서 ctrl+shift+p
+2) source Action 선택
+3) 테스트 파일명 자동 생성
+4)  원하는 메서드 체크 할 수 있다. 
+5) 선택한 내용으로 test 폴더,파일,코드 자동생성 (=> 파일이름+test.java 형식으로 생성됨.)
+6)  Geimi Unit Tests => 파일이름+tests.java 형식으로 생성됨.
