@@ -36,9 +36,24 @@ public class TodoEntity {
 
     private LocalDate dueDate;
 
-    public void changeTitle(String title) { this.title = title; }
-    public void changeComplete(boolean complete) { this.complete = complete; }
-    public void changeDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
+    // title 멤버변수 수정하는 메서드
+    public void changeTitle(String title) {
+        this.title = title;
+    }
+    // writer 수정하는 메서드
+    public void changeWriter(String writer) {
+        this.writer = writer;
+    }
+     // complete 수정하는 메서드
+    public void changeComplete(boolean complete) {
+        this.complete = complete;
+    }
+     // dueDate 수정하는 메서드
+    public void changeDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+
 }
 
 
