@@ -12,18 +12,23 @@ public interface TodoRepository extends JpaRepository<TodoEntity, Long> {
 
     // 사용자가 원하는  쿼리 메서드 작성
 
+    // 테스트1
     // @Query를 이용하는 방식( select * from tbl_todo )
     @Query("select t from TodoEntity t")
     Page<TodoEntity> listAll(Pageable pageable);
 
+    // 테스트2 
     // @Query 어노테이션의 속성 활용=> ":매개변수"
     @Query( "select t from TodoEntity t " +
                     " where t.title " +
-                     " like %:keyword%  and t.tno > 0 " +
-                    // " like concat('%', :keyword, '%') and t.tno > 0 " +
+                    //  " like %:keyword%  and t.tno > 0 " +
+                    " like concat('%', :keyword, '%') and t.tno > 0 " +
                     " order by t.tno desc")
     // @Query( value = "select * from tbl_todo t where t.title like concat('%', :keyword, '%')",
     //         countQuery = "select count(*) from tbl_todo t where t.title like concat('%', :keyword, '%')",
     //         nativeQuery = true)
     Page<TodoEntity>listOfTitle(@Param("keyword") String keyword, Pageable pageable);
+
+
+
 }

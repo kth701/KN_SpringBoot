@@ -38,6 +38,12 @@ dependencies {
 	// modelmapper
 	implementation 'org.modelmapper:modelmapper:3.1.1'
 
+	// Querydsl 설정
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
 	
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	// Lombok  설정
@@ -52,6 +58,20 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 }
+
+// Querydsl 설정 추가
+def generated = 'src/main/generated'
+
+// sourceSets에 생성된 Q-Type 클래스 경로 추가
+sourceSets {
+	main.java.srcDirs += [ generated ]
+}
+
+// gradle clean 시 생성된 Q-Type 클래스 삭제
+clean {
+	delete file(generated)
+}
+
 
 tasks.named('test') {
 	useJUnitPlatform()
