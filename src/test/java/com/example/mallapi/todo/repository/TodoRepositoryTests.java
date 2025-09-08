@@ -84,8 +84,8 @@ public class TodoRepositoryTests {
          TodoEntity todoEntity = result.orElseThrow(); //결과값 반환
 
           log.info("==========");
-          log.info("  founded tno: "+ todoEntity.getTno());
-          log.info("founded todo: {}", todoEntity);
+          log.info("==> founded tno: "+ todoEntity.getTno());
+          log.info("==> founded todo: {}", todoEntity);
           log.info("==========");
 
     }
@@ -125,13 +125,14 @@ public class TodoRepositoryTests {
 
     }
 
-    // 페이징 처리
+    // 페이징 처리: finall()을 이용하는 방식
     @Test
+    @DisplayName("페이징 처리:findAll()을 이용하는 방식")
     public void testPaging(){
         // 시작 페이지 : 0부터 시작
         // 검색해서 가져올 페이지 번호, 1페이지에 가져올 레코드 개수, 정렬 기준
         Pageable pageable = PageRequest.of(
-                    1, //  검색해서 가져올 페이지 번호
+                    0, //  검색해서 가져올 페이지 번호
                     10, //  1페이지에 가져올 레코드 개수
                     Sort.by("tno").descending() // 정렬 기준
                     );
@@ -146,9 +147,40 @@ public class TodoRepositoryTests {
         result.getContent().stream().forEach(todo -> log.info("==> {}", todo));
         log.info("-------------------");
 
-
-
     }
+
+    @Test
+    @DisplayName("페이징 처리: @Query를 이용하는 방식")
+    public void testPaging2(){
+                Pageable pageable = PageRequest.of( 0, 10, Sort.by("tno").descending() );
+                Page<TodoEntity> result = todoRepository.listAll(pageable);
+
+                log.info("==> @Query를 이용하는 방식: {}",result.getContent());
+                
+                log.info("--------------------------------------");
+                result
+                    .getContent()
+                    .stream()
+                    .forEach(todo -> log.info("==> {}", todo));
+    }
+    @Test
+    @DisplayName("페이징 처리: @Query어노테이션 속성")
+    public void testPaging3(){
+        String keyword = "1";
+
+        Pageable pageable = PageRequest.of( 0, 10, Sort.by("tno").descending() );
+        Page<TodoEntity> result = todoRepository.listOfTitle(keyword, pageable);
+
+        log.info("==> @Query어노테이션 속성: {}",result.getContent());
+        
+        log.info("--------------------------------------");
+        result
+            .getContent()
+            .stream()
+            .forEach(todo -> log.info("==> {}", todo));
+    }
+
+
 
 
 
