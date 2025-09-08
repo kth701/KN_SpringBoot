@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.mallapi.todo.dto.TodoDTO;
 import com.example.mallapi.todo.entity.TodoEntity;
 
 import lombok.extern.log4j.Log4j2;
@@ -179,6 +180,30 @@ public class TodoRepositoryTests {
             .stream()
             .forEach(todo -> log.info("==> {}", todo));
     }
+
+    @Test
+    @DisplayName("Search1 테스트: Querydsl적용")
+    public void testSearch1() {
+          Pageable pageable = PageRequest.of( 0, 10, Sort.by("tno").descending() );
+
+          Page<TodoEntity> result = todoRepository.search1(pageable);
+          result.getContent()
+            .stream()
+            .forEach(todo -> log.info("==> {}", todo));
+    }
+
+    @Test
+    @DisplayName("Search2 테스트: Querydsl적용")
+    public void testSearch2() {
+        Pageable pageable = PageRequest.of( 0, 10, Sort.by("tno").descending() );
+
+        Page<TodoDTO> result = todoRepository.searchDTO(pageable);
+        result.getContent()
+          .stream()
+          .forEach(todo -> log.info("==> {}", todo));
+
+    }
+
 
 
 

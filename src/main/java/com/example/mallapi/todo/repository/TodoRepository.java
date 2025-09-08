@@ -1,14 +1,18 @@
 package com.example.mallapi.todo.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.example.mallapi.todo.dto.TodoDTO;
 import com.example.mallapi.todo.entity.TodoEntity;
+import com.example.mallapi.todo.repository.search.TodoSearch;
 
-public interface TodoRepository extends JpaRepository<TodoEntity, Long> {
+public interface TodoRepository extends JpaRepository<TodoEntity, Long>, TodoSearch {
 
     // 사용자가 원하는  쿼리 메서드 작성
 
@@ -28,7 +32,9 @@ public interface TodoRepository extends JpaRepository<TodoEntity, Long> {
     //         countQuery = "select count(*) from tbl_todo t where t.title like concat('%', :keyword, '%')",
     //         nativeQuery = true)
     Page<TodoEntity>listOfTitle(@Param("keyword") String keyword, Pageable pageable);
-
-
+    
+    // Query에서 Projectons이용하기
+    @Query("select t from TodoEntity t where t.tno = :tno")
+    Optional<TodoDTO> getDTO(@Param("tno") Long tno);
 
 }

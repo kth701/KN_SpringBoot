@@ -7,8 +7,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
+import com.example.mallapi.todo.dto.TodoDTO;
 import com.example.mallapi.todo.entity.QTodoEntity;
 import com.example.mallapi.todo.entity.TodoEntity;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
 
 import lombok.extern.log4j.Log4j2;
@@ -16,7 +18,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class TodoSearchImpl extends QuerydslRepositorySupport   implements TodoSearch {
 
-    public TodoSearchImpl(Class<?> domainClass) {
+    public TodoSearchImpl() {
         super(TodoEntity.class);
     }
 
@@ -43,6 +45,29 @@ public class TodoSearchImpl extends QuerydslRepositorySupport   implements TodoS
         long count = query.fetchCount(); // 쿼리문에 대한 레코드 개수
 
         return new PageImpl<>(entityList, pageable, count);
+    }
+
+    @Override
+    public Page<TodoDTO> searchDTO(Pageable pageable) {
+        QTodoEntity todoEntity = QTodoEntity.todoEntity;
+        JPQLQuery<TodoEntity> query = from(todoEntity);
+        query.where(todoEntity.tno.gt(0L));
+
+        // JPQLQuery의 결과를 바로 DTO로 변환
+        JPQLQuery<TodoDTO> dtoQuery = 
+                query.select(Projections.constructor(TodoDTO.class, 
+                    todoEntity.tno,
+                    todoEntity.title,
+                    todoEntity.writer,
+                    todoEntity.complete,
+                    todoEntity.dueDate));
+        
+        this.getQuerydsl().applyPagination(pageable, dtoQuery);
+
+        List<TodoDTO> dtoList = dtoQuery.fetch();
+        long count = dtoQuery.fetchCount();
+
+        return new PageImpl<>(dtoList, pageable, count);
     }
 
 }
