@@ -50,17 +50,25 @@ public class TodoSearchImpl extends QuerydslRepositorySupport   implements TodoS
     @Override
     public Page<TodoDTO> searchDTO(Pageable pageable) {
         QTodoEntity todoEntity = QTodoEntity.todoEntity;
+
+        // select * from tbl_todo where tno > 0
         JPQLQuery<TodoEntity> query = from(todoEntity);
         query.where(todoEntity.tno.gt(0L));
 
         // JPQLQuery의 결과를 바로 DTO로 변환
+        // 1. Projections.constructor()이용
         JPQLQuery<TodoDTO> dtoQuery = 
-                query.select(Projections.constructor(TodoDTO.class, 
-                    todoEntity.tno,
-                    todoEntity.title,
-                    todoEntity.writer,
-                    todoEntity.complete,
-                    todoEntity.dueDate));
+                query.select(Projections.constructor(TodoDTO.class, todoEntity));
+
+        // 2.  Projections.bean()이용
+        // JPQLQuery<TodoDTO> dtoQuery = 
+        //     query.select(Projections.bean(TodoDTO.class,
+        //         todoEntity.tno,
+        //         todoEntity.title,
+        //         todoEntity.writer,
+        //         todoEntity.complete,
+        //         todoEntity.dueDate));
+
         
         this.getQuerydsl().applyPagination(pageable, dtoQuery);
 

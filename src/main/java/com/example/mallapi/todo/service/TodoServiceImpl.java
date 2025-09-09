@@ -23,16 +23,26 @@ public class TodoServiceImpl implements TodoService {
     
 
     @Override
-    public Long register(TodoDTO todoDTO) {
+    // public Long register(TodoDTO todoDTO) {
+     public TodoDTO register(TodoDTO todoDTO) {
 
         log.info("---- Todo Service 구현 중");
 
         // 클라이언트로 부터 전달 받은 자료 -> DTO 로 전달 받아 저장
 
-        TodoEntity todoEntity = modelMapper.map(todoDTO, TodoEntity.class );  // DTO -> Entity : modelMapper.map(객체 값, 엔티티.class)
-        TodoEntity saveTodoEntity = todoRepository.save(todoEntity); // Entity -> DB에 반영
+        // Entity ->  : modelMapper.map(객체 값, 엔티티.class)
+        // 1.  ModelMapper이용
+        // TodoEntity todoEntity = modelMapper.map(todoDTO, TodoEntity.class );  
 
-        return saveTodoEntity.getTno();
+        // 2.  TodoDTO 메서드 이용
+        TodoEntity todoEntity = todoDTO.toEntity();
+
+
+         // Entity -> DB에 반영
+        TodoEntity saveTodoEntity = todoRepository.save(todoEntity);
+
+        // return saveTodoEntity.getTno();
+        return new TodoDTO(todoEntity);
 
     }
 

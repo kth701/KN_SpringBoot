@@ -1,6 +1,8 @@
 package com.example.mallapi.todo.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -9,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.mallapi.todo.dto.TodoDTO;
 import com.example.mallapi.todo.entity.TodoEntity;
+import com.example.mallapi.todo.service.TodoService;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -26,8 +30,8 @@ import org.springframework.transaction.annotation.Propagation;
 
 
 
-// @SpringBootTest // 통합테스트 용도
-@DataJpaTest // 단위테스트 용도(JPA Entity: 데이터 테스트용)
+@SpringBootTest // 통합테스트 용도
+// @DataJpaTest // 단위테스트 용도(JPA Entity: 데이터 테스트용)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 실제 DB에 반영
 @Transactional(propagation = Propagation.NOT_SUPPORTED) // 트랜젝션 메서드 단위로 설정 하지 않음
 @Log4j2
@@ -35,6 +39,8 @@ public class TodoRepositoryTests {
 
     @Autowired// 객체 주입(테스트에서 주로 사용하는 주입 어노테이션)
     private TodoRepository todoRepository;// todoRepository 객체 생성
+    @Autowired
+    private TodoService todoService;
 
 
     @Test
@@ -201,6 +207,23 @@ public class TodoRepositoryTests {
         result.getContent()
           .stream()
           .forEach(todo -> log.info("==> {}", todo));
+
+    }
+
+    @Test
+    @DisplayName("DTO를 이용한 등록 테스트")
+    public void testServiceRegister() {
+        TodoDTO todoDTO = new TodoDTO();
+        todoDTO.setTitle("Test Todo");
+        todoDTO.setWriter("user00");
+        todoDTO.setComplete(false);
+        todoDTO.setDueDate(LocalDate.now().plusDays(1));
+
+        TodoDTO savedTodoDTO = todoService.register(todoDTO);
+
+        log.info("--- savedTodoDTO: {}", savedTodoDTO);
+
+        assertThat(savedTodoDTO.getTno()).isNotNull();
 
     }
 

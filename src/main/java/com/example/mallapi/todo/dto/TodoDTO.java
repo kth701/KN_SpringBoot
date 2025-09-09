@@ -34,6 +34,16 @@ public class TodoDTO {
         this.dueDate = todoEntity.getDueDate();
     }
     // DTO -> Entity메서드
+    public TodoEntity toEntity(){
+        return TodoEntity.builder()
+            .tno(this.tno)
+            .title(this.title)
+            .writer(this.writer)
+            .complete(this.complete)
+            .dueDate(this.dueDate)
+            .build();
+    }
+
 
 
 }
