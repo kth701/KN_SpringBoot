@@ -33,7 +33,11 @@ public interface TodoRepository extends JpaRepository<TodoEntity, Long>, TodoSea
     //         nativeQuery = true)
     Page<TodoEntity>listOfTitle(@Param("keyword") String keyword, Pageable pageable);
     
-    // Query에서 Projectons이용하기
+
+    // ----------------------------------------------------------- //
+    // Query에서 Projectons이용하기 
+    //      =>TodoDTO생성로 통해서 Entity -> DTO변환 
+    // ----------------------------------------------------------- //
     @Query("select t from TodoEntity t where t.tno = :tno")
     Optional<TodoDTO> getDTO(@Param("tno") Long tno);
 

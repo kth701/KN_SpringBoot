@@ -1,10 +1,11 @@
 package com.example.mallapi.todo.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 import java.util.Optional;
+
+import javax.naming.NameNotFoundException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,10 +20,12 @@ import org.springframework.data.domain.Sort;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.mallapi.todo.dto.PageRequestDTO;
 import com.example.mallapi.todo.dto.TodoDTO;
 import com.example.mallapi.todo.entity.TodoEntity;
 import com.example.mallapi.todo.service.TodoService;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
 
 
@@ -84,11 +87,16 @@ public class TodoRepositoryTests {
     @Test
     @DisplayName("존재하는 TNO로 Todo 데이터 조회")
     public void testTodoRead(){
-         Long tno = 33L;
+         Long tno = 1000L;
 
-         // null 처리 => Optional타입 설정
+         // 조회실패시 null처리 -> null 처리하는 타입 -> Optinal
          Optional<TodoEntity> result = todoRepository.findById(tno); // tno 조회요청
-         TodoEntity todoEntity = result.orElseThrow(); //결과값 반환
+        
+        TodoEntity todoEntity = result.orElseThrow(); //결과값 반환
+        // TodoEntity todoEntity = result.orElseThrow(
+        //     () -> new EntityNotFoundException("Todo "+ tno +"를 찾을 수 없습니다.")
+        // );
+
 
           log.info("==========");
           log.info("==> founded tno: "+ todoEntity.getTno());
@@ -213,12 +221,16 @@ public class TodoRepositoryTests {
     @Test
     @DisplayName("DTO를 이용한 등록 테스트")
     public void testServiceRegister() {
+
         TodoDTO todoDTO = new TodoDTO();
+
         todoDTO.setTitle("Test Todo");
         todoDTO.setWriter("user00");
         todoDTO.setComplete(false);
         todoDTO.setDueDate(LocalDate.now().plusDays(1));
 
+        // Service테스트: 통합테스트 => @SpringBootTest적용
+        // Repository테스트: 단위테스트 => @DataJpaTest적용시 에러
         TodoDTO savedTodoDTO = todoService.register(todoDTO);
 
         log.info("--- savedTodoDTO: {}", savedTodoDTO);
@@ -226,6 +238,75 @@ public class TodoRepositoryTests {
         assertThat(savedTodoDTO.getTno()).isNotNull();
 
     }
+
+    @Test
+    @DisplayName("DTO를 이용한 조회 테스트")
+    public void testGetTodoDTO() {
+        Long tno = 1L;
+        //  Long tno = 1000L; // 업는 tno번호 조회시 사용자가 정의 예외 발생 처리
+        TodoDTO result = todoService.read(tno);
+
+        log.info("==> result: {}", result);
+
+        assertThat(result.getTno()).isEqualTo(tno);
+        
+    }
+    @Test
+    @DisplayName("DTO를 이용한 삭제 테스트")
+    public void testRemoveTodoDTO() {
+        // Long tno = 1000L;// 존재하지 않는 tno
+        Long tno = 105L; // 존재하는 tno
+        todoService.remove(tno);
+
+    }   
+    @Test
+    @DisplayName("DTO를 이용한 수정 테스트")
+    public void testModifyTodoDTO(){
+        // 수정할 객체 생성해서 초기화
+        TodoDTO todoDTO = new TodoDTO();
+
+        todoDTO.setTno(104L);
+        todoDTO.setTitle("수정된 제목");
+        todoDTO.setComplete(true);
+        todoDTO.setDueDate(LocalDate.now().plusDays(1));
+        
+        // 수정 서비스 요청
+        TodoDTO result = todoService.modify(todoDTO);
+        log.info("==> result: {}", result);
+
+        assertThat(result.getTitle()).isEqualTo("수정된 제목");
+        assertThat(result.isComplete()).isEqualTo(true);
+        assertThat(result.getDueDate()).isEqualTo(LocalDate.now().plusDays(1));
+
+    }
+
+    @Test
+    @DisplayName("DTO를 이용한 목록 조회 테스트")
+    public void testListTodoDTO(){
+        PageRequestDTO pageRequestDTO = new PageRequestDTO();
+        // 기본값: page=1, size=10
+
+        pageRequestDTO.setPage(2);
+        pageRequestDTO.setSize(5);
+
+        Page<TodoDTO> result = todoService.list(pageRequestDTO);
+
+        log.info("-----------------------");
+        log.info("Prev: {}", result.previousPageable());
+        log.info("Next: {}", result.nextPageable());
+        log.info("Total: {}", result.getTotalElements());
+        log.info("Number: {}", result.getNumber());
+        log.info("-----------------------");
+        log.info("==> result: {}", result);
+        log.info("-----------------------");
+
+        result.getContent()
+            .stream()
+            .forEach(todo -> log.info("=> {}", todo));
+
+    }
+
+
 
 
 
