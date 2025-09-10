@@ -316,10 +316,27 @@ public class TodoRepositoryTests {
             .build();
 
         PageResponseDTO<TodoDTO> result = todoService.getTodoList(pageRequestDTO);
-        
         log.info("--- PageResponseDTO 이용한 목록 조회 테스트");
         log.info("==> result: {}", result);
 
+        result.getDtoList()
+            .stream()
+            .forEach(todo -> log.info("==> {}", todo)); 
+
+        log.info("\n--- PageResponseDTO ---");
+        log.info("=> page={}, size={}, start={}, end={},prev={}, next={}, totalCount={}, prevPage={}, nextPage={}, totalPage={}, current={}",
+            result.getPageRequestDTO().getPage(),
+            result.getPageRequestDTO().getSize(),
+            result.getStart(),
+            result.getEnd(),
+            result.isPrev(), 
+            result.isNext(),
+            result.getTotalCount(),
+            result.getPrevPage(),
+            result.getNextPage(),
+            result.getTotalPage(),
+            result.getCurrent()
+        );
 
     }
         

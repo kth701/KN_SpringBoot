@@ -125,6 +125,7 @@ public class TodoServiceImpl implements TodoService {
             Sort.by("tno").descending()); // 정렬 기준
 
 
+        /* 1. ModelMapper이용 : Entity -> DTO   
         // query 결과값 Entity타입
         Page<TodoEntity> result = todoRepository.findAll(pageable);
 
@@ -133,6 +134,15 @@ public class TodoServiceImpl implements TodoService {
         // map(ModelMapper을 이용하여 entity -> dto)
             .map(entity -> modelMapper.map(entity, TodoDTO.class)) 
             .collect(Collectors.toList()); // stream에 있는 객체를 List타입으로 변환
+       */
+
+        // 2. Querydsl에서 Projections 사용: Entity -> DTO (ModelMapper 미사용)
+        // query 결과값 Entity타입 자동 DTO로 변환해서 반환
+
+        Page<TodoDTO> result = todoRepository.searchDTO(pageable); 
+        List<TodoDTO> dtoList = result.getContent();
+
+        
 
         long totalCount = result.getTotalElements();// xxx.getTotalElements() :long 타입
 
