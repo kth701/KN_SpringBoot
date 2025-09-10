@@ -1,4 +1,15 @@
 
+- 단축키
+    : Shift+Alt+O : auto import
+    : Ctrl+Shift+K: line delete
+
+
+-  build.gradle 파일 동기화
+    : Ctrl+Shift+P : Clean Java Language Server Workspace
+
+
+- 테스트 코드 경로및 소스 파일 생성 방법
+
 0) 테스트 코드 작성할 소스 Open
 1) 테스트 원하는 클래스나 메서드에 커서 위치해 두고 vscode 에서 ctrl+shift+p
 2) source Action 선택
@@ -6,3 +17,10 @@
 4)  원하는 메서드 체크 할 수 있다. 
 5) 선택한 내용으로 test 폴더,파일,코드 자동생성 (=> 파일이름+test.java 형식으로 생성됨.)
 6)  Geimi Unit Tests => 파일이름+tests.java 형식으로 생성됨.
+
+- Q-Type 도메인 인식 안될 경우
+    1. 좌측 Gradle아이콘 선택
+    2. build -> clean 선택
+    3. other -> compleJava 선택(또는 프로젝트 재로딩)
+
+
