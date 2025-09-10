@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.mallapi.todo.dto.PageRequestDTO;
+import com.example.mallapi.todo.dto.PageResponseDTO;
 import com.example.mallapi.todo.dto.TodoDTO;
 import com.example.mallapi.todo.entity.TodoEntity;
 import com.example.mallapi.todo.service.TodoService;
@@ -305,6 +306,23 @@ public class TodoRepositoryTests {
             .forEach(todo -> log.info("=> {}", todo));
 
     }
+
+    @Test
+    @DisplayName("PageResponseDTO 이용한 목록 조회 테스트2")
+    public void testGetTodoList(){
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+            .page(2)
+            .size(10)
+            .build();
+
+        PageResponseDTO<TodoDTO> result = todoService.getTodoList(pageRequestDTO);
+        
+        log.info("--- PageResponseDTO 이용한 목록 조회 테스트");
+        log.info("==> result: {}", result);
+
+
+    }
+        
 
 
 

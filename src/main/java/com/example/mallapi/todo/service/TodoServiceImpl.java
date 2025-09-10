@@ -1,15 +1,19 @@
 package com.example.mallapi.todo.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.mallapi.todo.dto.PageRequestDTO;
+import com.example.mallapi.todo.dto.PageResponseDTO;
 import com.example.mallapi.todo.dto.TodoDTO;
 import com.example.mallapi.todo.entity.TodoEntity;
 import com.example.mallapi.todo.repository.TodoRepository;
@@ -110,6 +114,37 @@ public class TodoServiceImpl implements TodoService {
         Pageable pageable = pageRequestDTO.getPageable(sort);
 
         return todoRepository.searchDTO(pageable);
+    }
+
+    @Override
+    public PageResponseDTO<TodoDTO> getTodoList(PageRequestDTO pageRequestDTO) {
+
+        Pageable pageable = PageRequest.of(
+            pageRequestDTO.getPage()-1, // 보여질 페이지 번호
+            pageRequestDTO.getSize(), // 한페이지에 보여질 데이터 개수
+            Sort.by("tno").descending()); // 정렬 기준
+
+
+        // query 결과값 Entity타입
+        Page<TodoEntity> result = todoRepository.findAll(pageable);
+
+        // ModelMapper이용 : Entity -> DTO
+        List<TodoDTO> dtoList = result.getContent().stream()
+        // map(ModelMapper을 이용하여 entity -> dto)
+            .map(entity -> modelMapper.map(entity, TodoDTO.class)) 
+            .collect(Collectors.toList()); // stream에 있는 객체를 List타입으로 변환
+
+        long totalCount = result.getTotalElements();// xxx.getTotalElements() :long 타입
+
+        PageResponseDTO<TodoDTO> pageResponseDTO = PageResponseDTO.<TodoDTO>withAll()
+            .dtoList(dtoList)  // 쿼리 결과 값은 전달
+            .pageRequestDTO(pageRequestDTO) // 페이지 정보 전달
+            .totalCount(totalCount) // 전체 데이터 전달
+            .build();
+
+        return pageResponseDTO;
+
+
     }
 
 }

@@ -3,6 +3,7 @@ package com.example.mallapi.todo.service;
 import org.springframework.data.domain.Page;
 
 import com.example.mallapi.todo.dto.PageRequestDTO;
+import com.example.mallapi.todo.dto.PageResponseDTO;
 import com.example.mallapi.todo.dto.TodoDTO;
 
 public interface TodoService {
@@ -18,8 +19,10 @@ public interface TodoService {
     TodoDTO modify(TodoDTO todoDTO);
     // 삭제 기능
     void remove(Long tno);
-    // 목록 기능
+    // 목록 기능1(PageResponseDTO 미적용)
     Page<TodoDTO> list(PageRequestDTO pageRequestDTO);
+     // 목록 기능2(PageResponseDTO 적용)
+    PageResponseDTO<TodoDTO> getTodoList(PageRequestDTO pageRequestDTO);
     
 
 }
