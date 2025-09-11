@@ -2,6 +2,7 @@ package com.example.mallapi.todo.controller.advice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import com.example.mallapi.todo.exception.EntityNotFoundException;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -47,7 +50,7 @@ public class APIControllerAdvice {
         log.error("-> Validation error: {}", e.getMessage());
 
         Map<String, String> errors = new HashMap<>();
-        
+
         errors.put("error", "Type Mismatched");
         errors.put(e.getName(), e.getValue()+" is not valid value");
 
@@ -62,5 +65,20 @@ public class APIControllerAdvice {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         
     }
+
+    // 서비스 계층에서 ID로 엔티티를 찾을 수 없을 때 발행 : EntityNotFoundException
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<?> handleValidationException(EntityNotFoundException e){
+        log.error("-> EntityNotFoundException: {}", e.getMessage());
+
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message","Entity Not Found");
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
+
+    }
+
+
+
 
 }
