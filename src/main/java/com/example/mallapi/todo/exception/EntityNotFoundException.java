@@ -8,11 +8,11 @@ public class EntityNotFoundException extends RuntimeException {
     private String messge;
     private int code;
 
-    public EntityNotFoundException(String message, int code) {
+    public EntityNotFoundException(String message) {
         super(message);
 
         this.messge = message;
-        this.code = code;
+        this.code = 404;
     }
 
 }

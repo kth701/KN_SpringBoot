@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import com.example.mallapi.todo.exception.EntityNotFoundException;
-
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
 
 
@@ -66,18 +65,33 @@ public class APIControllerAdvice {
         
     }
 
+
+    // EntityNotFoundException: RuntimeException클래스 상속 받은 직접 제작한 예외처리
     // 서비스 계층에서 ID로 엔티티를 찾을 수 없을 때 발행 : EntityNotFoundException
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<?> handleValidationException(EntityNotFoundException e){
-        log.error("-> EntityNotFoundException: {}", e.getMessage());
+    // 예외 발생이 안됨. => NoSuchElementException예외발생으로 처리됨.
+   @ExceptionHandler(EntityNotFoundException.class)
+   public ResponseEntity<?> handleEntityNotFound(EntityNotFoundException e){
+       log.error("-> EntityNotFoundException: {}", e.getMessage());
 
-        Map<String, String> errors = new HashMap<>();
-        errors.put("message","Entity Not Found");
+       Map<String, String> errors = new HashMap<>();
+       // 예외 객체에 포함된 상세 메시지를 반환하여 클라이언트가 원인을 명확히 알 수 있도록 합니다.       
+       errors.put("error", e.getMessage());  // key는 "error" 설정시 메시지 정상
+       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
+   }
+    /*
+    // JPA findById().get() 등에서 발생할 수 있는 예외 처리=> EntityNotFoundException대신 사용
+    // TodoServiceImp에서 result.orElseThrow()=> 예외처리를 사용정의 클래스 사용하지 않으면 작동됨
+    // @ExceptionHandler(NoSuchElementException.class)
+    // public ResponseEntity<?> handleNoSuchElementException(NoSuchElementException e) {
+    //     log.error("-> NoSuchElementException: {}", e.getMessage());
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
+    //     Map<String, String> errors = new HashMap<>();
+    //     //errors.put("error", "Requested resource was not found.");
+    //     errors.put("error", "Entity Not Found");
 
-    }
-
+    //     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
+    // }
+     */
 
 
 

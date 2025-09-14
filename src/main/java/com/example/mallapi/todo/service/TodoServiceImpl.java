@@ -17,8 +17,8 @@ import com.example.mallapi.todo.dto.PageResponseDTO;
 import com.example.mallapi.todo.dto.TodoDTO;
 import com.example.mallapi.todo.entity.TodoEntity;
 import com.example.mallapi.todo.repository.TodoRepository;
-
 import jakarta.persistence.EntityNotFoundException;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -79,6 +79,8 @@ public class TodoServiceImpl implements TodoService {
         Optional<TodoEntity> result = todoRepository.findById(tno);
         // 없으면 예외 처리 발생 처리
         TodoEntity todoEntity = result.orElseThrow(
+            // 사용자가 직접 작성한 예외 처리 객체 생성하여 처리
+            // APIControllerAdvice예외 처리시 : NoSuchElementException으로 처리되며 EntityNotFoundException클래스 생성자는 생략해야 인식됨.
             ()->new EntityNotFoundException("삭제할 "+ tno +" 를 찾을 수 없습니다")
         );
 
@@ -93,7 +95,7 @@ public class TodoServiceImpl implements TodoService {
         Optional<TodoEntity> result = todoRepository.findById(todoDTO.getTno());
 
         TodoEntity todoEntity = result.orElseThrow(
-            () ->new EntityNotFoundException("수정할 "+ todoDTO.getTno() +" 를 찾을 수 없습니다")
+            () ->new EntityNotFoundException("수정 할 "+ todoDTO.getTno() +" 를 찾을 수 없습니다...")
         );
 
         //  수정 작업 처리
