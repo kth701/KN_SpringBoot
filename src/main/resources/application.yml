@@ -22,7 +22,9 @@ spring:
 logging:
   level:
     org:
-      springframework: info
+      springframework:
+        security:
+          web: trace
     jakarta: #jakarta 로깅 추가
       persistence: trace
       security:   # Spring Security 관련된 로그
