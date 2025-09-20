@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.stream.IntStream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -18,31 +20,41 @@ class MemberRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
 
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Test
     public void testInsertMember() {
         log.info("---------testInsertMember-----------");
 
-        Member member = Member.builder()
-                .email("test@example.com")
-                //.pw(passwordEncoder.encode("1111"))
-                .pw("1111")
-                .nickname("Test User")
-                .social(false)
-                .build();
+        IntStream.rangeClosed(1, 10).forEach(i -> {
+            Member member = Member.builder()
+                    .email("user" + i + "@test.com")
+                    .pw(passwordEncoder.encode("1234"))
+                    .nickname("USER" + i)
+                    .social(false)
+                    .build();
 
-        member.addRole(MemberRole.USER);
+            member.addRole(MemberRole.USER);
 
-        memberRepository.save(member);
+            if (i >= 3 && i <= 7) { // 5명
+                member.addRole(MemberRole.MANAGER);
+            }
+
+            if (i >= 8) { // 3명
+                member.addRole(MemberRole.MANAGER);
+                member.addRole(MemberRole.ADMIN);
+            }
+
+            memberRepository.save(member);
+        });
     }
 
     @Test
     public void testUpdateMember() {
         log.info("---------testUpdateMember-----------");
 
-        String email = "test@example.com";
+        String email = "user1@example.com";
         String newNickname = "Updated User";
         String newPw = "54321";
         boolean newSocial = true;
@@ -76,10 +88,10 @@ class MemberRepositoryTest {
 
     @Test
     void getWithRoles() {
-        Member member = memberRepository.findById("test@example.com").orElseThrow();
+        Member member = memberRepository.findById("user9@example.com").orElseThrow();
 
         log.info("=======================");
         log.info(member);
-        log.info(member.getMemberRoles());
+        log.info(member.getMemberRolesList());
     }
 }

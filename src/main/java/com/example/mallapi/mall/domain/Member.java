@@ -1,10 +1,7 @@
 package com.example.mallapi.mall.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Builder
+@Builder@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = "memberRolesList")
@@ -23,7 +20,10 @@ public class Member {
 
     private String pw;
     private String nickname;
-    private boolean social;
+
+    private boolean del;// 회원 탈퇴여부
+    private boolean social;// 소셜 로그인 사용 여부
+
 
     @ElementCollection(fetch = FetchType.EAGER) // 즉시 연결
     @Builder.Default
@@ -49,6 +49,9 @@ public class Member {
     
     public void changeSocial(boolean social) {
         this.social = social;
+    }
+    public void changeDel(boolean del) {
+        this.del = del;
     }
 
 }
