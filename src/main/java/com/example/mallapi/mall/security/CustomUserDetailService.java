@@ -38,6 +38,7 @@ public class CustomUserDetailService implements UserDetailsService {
                 member.getNickname(),
                 member.isSocial(),
                 member.isDel(),
+                // "USER", "MANAGER", "ADMIN"
                 member.getMemberRolesList()
                         .stream()
                         .map(memberRole ->

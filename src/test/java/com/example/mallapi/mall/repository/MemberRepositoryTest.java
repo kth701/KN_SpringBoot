@@ -33,6 +33,7 @@ class MemberRepositoryTest {
                     .pw(passwordEncoder.encode("1234"))
                     .nickname("USER" + i)
                     .social(false)
+                    .del(false)
                     .build();
 
             member.addRole(MemberRole.USER);

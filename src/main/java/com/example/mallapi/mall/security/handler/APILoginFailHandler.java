@@ -19,7 +19,7 @@ public class APILoginFailHandler implements AuthenticationFailureHandler {
 
         Gson gson = new Gson();
 
-        String json = gson.toJson(Map.of("error", "ERROR_lGIN"));
+        String json = gson.toJson(Map.of("error", "ERROR_LOGIN"));
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

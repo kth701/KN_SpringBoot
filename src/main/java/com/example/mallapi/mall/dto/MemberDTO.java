@@ -25,6 +25,7 @@ public class MemberDTO extends User {
     private List<String> roleNames = new ArrayList<>();
 
 
+
     // 생성자
     public MemberDTO(
                             String username,
@@ -51,6 +52,7 @@ public class MemberDTO extends User {
         this.nickname = nickname;
         this.social = social;
         this.del = del;
+        this.roleNames = roleNames;//"USER","MANAGER","ADMIN"
     }
 
     // JWT문자열 생성시 사용하기 위함

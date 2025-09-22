@@ -46,7 +46,7 @@ public class CustomSecurityConfig {
         
         // security 로그인 폼 설정 => POST방식, username, password파리미터를 통해 로그인처리
         http.formLogin(config -> {
-            
+
             config.loginPage("/api/member/login");// API서로 로그인 할 수 있게 설정
             config.successHandler(new APILoginSuccessHandler());
             config.failureHandler(new APILoginFailHandler());

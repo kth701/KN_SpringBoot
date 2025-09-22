@@ -1,0 +1,6 @@
+// Talend REST API 사용하기 //
+
+1. Login Form형식 username, password값 전달 방법
+    - Headers 탭: Content-Type => application/x-www-form-urlencoded로 설정
+    - Body탭 -> Form 선택 -> add form parameter -> application/x-www-form-urlencoded 체크
+             ->username, password 항목 추가 및 값 입력
