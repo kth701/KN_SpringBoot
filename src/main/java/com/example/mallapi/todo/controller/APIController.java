@@ -3,6 +3,7 @@ package com.example.mallapi.todo.controller;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -82,6 +83,7 @@ public class APIController {
     }
 
     // 목록 서비스 요청
+    //@PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/list")  // url = "/api/v1/todos/list?page=1&size=10"
     public ResponseEntity<?> list(@Validated PageRequestDTO pageRequestDTO){
         log.info("List Todos: {}", pageRequestDTO);
