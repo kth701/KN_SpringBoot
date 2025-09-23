@@ -30,7 +30,7 @@ class MemberRepositoryTest {
         IntStream.rangeClosed(1, 10).forEach(i -> {
             Member member = Member.builder()
                     .email("user" + i + "@test.com")
-                    .pw(passwordEncoder.encode("1234"))
+                    .pw(passwordEncoder.encode("1111"))
                     .nickname("USER" + i)
                     .social(false)
                     .del(false)

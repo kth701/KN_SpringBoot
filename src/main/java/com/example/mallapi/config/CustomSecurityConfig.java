@@ -1,5 +1,6 @@
 package com.example.mallapi.config;
 
+import com.example.mallapi.mall.security.filter.JWTCheckFilter;
 import com.example.mallapi.mall.security.handler.APILoginFailHandler;
 import com.example.mallapi.mall.security.handler.APILoginSuccessHandler;
 import lombok.extern.log4j.Log4j2;
@@ -12,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -51,6 +53,12 @@ public class CustomSecurityConfig {
             config.successHandler(new APILoginSuccessHandler());
             config.failureHandler(new APILoginFailHandler());
         });
+
+        // JWT 체크
+        // 일반적으로 로그인 처리 이전에 JWT Check Filter먼저 처리(JWT인증처리할 것인지 여부 확인하는 절차)
+        http.addFilterBefore(
+                new JWTCheckFilter(), // 첫번째 인자는 두번째 인자 처리 이전에 실행
+                UsernamePasswordAuthenticationFilter.class);// 두번째 인자
 
         // 요청 경로별 인가 설정
 //        http.authorizeHttpRequests(authorize -> {
