@@ -1,7 +1,6 @@
 package com.example.mallapi.mall.security.filter;
 
 
-import com.example.mallapi.mall.domain.Member;
 import com.example.mallapi.mall.dto.MemberDTO;
 import com.example.mallapi.util.CustomJWTException;
 import com.example.mallapi.util.JWTUtil;
@@ -17,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,13 +29,17 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         log.info("--> JWTCheckFilter path:"+path);
 
+        // APIController 요청 경로 설정
         // Prefilight요청은 Security JWT Check Filter 체크하지 않음
         if (request.getMethod().equals("OPTIONS")) return true;
-        //if (path.startsWith("/todo/")) return true;
         //if (path.startsWith("/api/v1/todos/")) return true;
 
         if (path.startsWith("/api/member/")) return true;
         if (path.startsWith("/api/products/view")) return true;
+
+
+        // TodoController 요청 경로 설정
+        if (path.startsWith("/todos/")) return true;
 
         return false;
     }
@@ -48,7 +52,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         try {
             // 1. Authentication헤더 및 Bearer 확인 절차
-            if (authHeaderStr == null && !authHeaderStr.startsWith("Bearer ")) {
+            if (authHeaderStr == null || !authHeaderStr.startsWith("Bearer ")) {
                 throw new CustomJWTException("Token is not available");
             }
 
@@ -59,7 +63,12 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
             // 3. 토큰에 사용자 정보 추출 및 SecurityContext에 인증 정보 설정
             String email = (String) claims.get("email");
-            String pwd = (String) claims.get("password");// 비번은 인증용으로 사용되지 않음
+            String pwd = ""; // 패스워드는 JWT에 포함되지 않으므로 임의의 값을 사용
+
+            List<String> roleNames = (List<String>) claims.get("roleNames");
+            if (roleNames == null) {
+                roleNames = new ArrayList<>();
+            }
 
             MemberDTO memberDTO = new MemberDTO(
                     email,
@@ -67,25 +76,28 @@ public class JWTCheckFilter extends OncePerRequestFilter {
                     (String)claims.get("nickname"),
                     (Boolean) claims.get("social"),
                     (Boolean) claims.get("del"),
-                    (List<String>) claims.get("roleNames")
-                    );
-        log.info("--> JWT claims:"+memberDTO);
+                    roleNames
+            );
+            log.info("--> JWT claims:"+memberDTO);
 
-        // 4. Security에 인증 정보 등록
-        //  AuthenticationToken을 생성하여 사용자 정보 => principal =>
-        //  비빌번호(credentials), 권한(authorities)을 설정
-        //  이 토큰은 현재 요청이 인증되었음 Spring Security에 알리는 역할
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(memberDTO,memberDTO.getAuthorities());
-        // SecurityContextHolder에 인증정보를 설정하여, 현재 스레드(요청)에서 인등된 사용자로 처리됨.
-        // 이후 필터나 컨트롤러에서 @PreAuthorize와 같은 어노테이션이 동작
-        SecurityContextHolder
-                .getContext()
-                .setAuthentication(usernamePasswordAuthenticationToken);
+            // 4. Security에 인증 정보 등록
+            //  AuthenticationToken을 생성하여 사용자 정보 => principal =>
+            //  비밀번호(credentials), 권한(authorities)을 설정
+            //  이 토큰은 현재 요청이 인증되었음 Spring Security에 알리는 역할
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                    new UsernamePasswordAuthenticationToken(memberDTO, pwd, memberDTO.getAuthorities());
+            // SecurityContextHolder에 인증정보를 설정하여, 현재 스레드(요청)에서 인증된 사용자로 처리됨.
+            // 이후 필터나 컨트롤러에서 @PreAuthorize와 같은 어노테이션이 동작
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(usernamePasswordAuthenticationToken);
+
+            // 다음 필터로 전달
+            filterChain.doFilter(request, response);
 
         } catch (Exception e) {
-           // JWT 관련 예외 발생시 에러 응답
-            log.info("--> JWT CheckFilter exception: {}", e.getMessage());
+            // JWT 관련 예외 발생시 에러 응답
+            log.error("--> JWT CheckFilter exception: {}", e.getMessage());
 
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

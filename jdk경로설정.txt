@@ -1,1 +1,13 @@
+
+
 G:\SpringStudy\jdk21_zulu\bin
+
+
+
+
+- 기존 프로젝트 Open시 오류 발생할 경우 에러 메시지 케이스
+IntelliJ에서 com.example.mallapi.MallapiApplication 클래스를 찾거나 로드할 수 없다는 오류는
+주로 캐시 문제, 빌드 설정 오류, 또는 프로젝트 경로 문제로 발생
+    IntelliJ IDE를 완전히 종료했다가 다시 시작.
+    1. File > Invalidate Caches / Restart... 메뉴를 선택하고
+    2. Invalidate and Restart를 클릭하여 캐시를 삭제.

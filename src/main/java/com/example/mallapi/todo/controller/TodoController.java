@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.time.LocalDate;
 
 @Controller
-@RequestMapping("/todo") // URL 경로 구분을 위해 클래스 레벨에 @RequestMapping 추가
+@RequestMapping("/todos") // URL 경로 구분을 위해 클래스 레벨에 @RequestMapping 추가
 @Log4j2
 @RequiredArgsConstructor
 public class TodoController {
