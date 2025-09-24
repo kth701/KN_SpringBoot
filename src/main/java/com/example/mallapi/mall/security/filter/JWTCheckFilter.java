@@ -22,8 +22,8 @@ import java.util.Map;
 
 @Log4j2
 public class JWTCheckFilter extends OncePerRequestFilter {
-    // 필터로 체크하지 않을 경로를 설정
-    // true이면 필터처리 하지 않음, false 이면 필터처리
+    // JWT Check Filter로 체크하지 않을 경로를 설정
+    // true이면 JWT Check Filter처리 하지 않음, false 이면 JWT Check Filter처리
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
@@ -65,6 +65,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             String email = (String) claims.get("email");
             String pwd = ""; // 패스워드는 JWT에 포함되지 않으므로 임의의 값을 사용
 
+
             List<String> roleNames = (List<String>) claims.get("roleNames");
             if (roleNames == null) {
                 roleNames = new ArrayList<>();
@@ -85,7 +86,12 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             //  비밀번호(credentials), 권한(authorities)을 설정
             //  이 토큰은 현재 요청이 인증되었음 Spring Security에 알리는 역할
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(memberDTO, pwd, memberDTO.getAuthorities());
+                    new UsernamePasswordAuthenticationToken(
+                            memberDTO, // 사용자 정보(principal):email,pw,...
+                            pwd, // 실제 인증에 사용되지않음(credentials)
+                            memberDTO.getAuthorities()// 권한정보: MemberDTO에서 권한 목록 가져옴
+                    );
+
             // SecurityContextHolder에 인증정보를 설정하여, 현재 스레드(요청)에서 인증된 사용자로 처리됨.
             // 이후 필터나 컨트롤러에서 @PreAuthorize와 같은 어노테이션이 동작
             SecurityContextHolder
