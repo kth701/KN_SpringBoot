@@ -7,8 +7,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 
 @Data
 @NoArgsConstructor

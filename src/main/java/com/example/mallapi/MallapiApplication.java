@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
-@SpringBootApplication
-//@SpringBootApplication(exclude = SecurityAutoConfiguration.class)// security로그인 화면 숨기기 어노테이션
+//@SpringBootApplication
+@SpringBootApplication(exclude = SecurityAutoConfiguration.class)// security로그인 화면 숨기기 어노테이션
 public class MallapiApplication {
 
 	

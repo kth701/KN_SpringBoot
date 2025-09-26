@@ -36,35 +36,39 @@ public class CustomSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("--- security configure : SecurityFilterChain ---");
 
+        /* JWT처리
         // CORS 설정
         http.cors(httpSecurityCorsConfigurer ->
                 httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource())
         );
 
-        // 세션 STATELESS 설정
+
+        // 세션 STATELESS 설정(무세션)
         http.sessionManagement(sessionConfig ->
                 sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        */
 
         // CSRF 비활성화
         http.csrf(csrf -> csrf.disable());
         
         // security 로그인 폼 설정 => POST방식, username, password파리미터를 통해 로그인처리
         http.formLogin(config -> {
-
+            // JWT 로그인 access token 인증하기
             config.loginPage("/api/member/login");// API서로 로그인 할 수 있게 설정
             config.successHandler(new APILoginSuccessHandler());
             config.failureHandler(new APILoginFailHandler());
         });
 
+        /*
         // JWT 체크
         // 일반적으로 로그인 처리 이전에 JWT Check Filter먼저 처리(JWT인증처리할 것인지 여부 확인하는 절차)
         http.addFilterBefore(
                 new JWTCheckFilter(), // 첫번째 인자는 두번째 인자 처리 이전에 실행
                 UsernamePasswordAuthenticationFilter.class);// 두번째 인자
+         */
 
-        // 요청 경로별 인가 설정
+        //  JWT방식이 아닌 요청 경로별 인가 설정
 //        http.authorizeHttpRequests(authorize -> {
-//            authorize.requestMatchers("/api/member/login", "/api/member/join").permitAll();
 //            // 로그인 및 토큰 재발급 경로는 모두에게 허용
 //            authorize.requestMatchers("/api/member/login", "/api/member/refresh","/api/member/kakao").permitAll();
 //
