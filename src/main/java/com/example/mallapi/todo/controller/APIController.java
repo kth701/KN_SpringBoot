@@ -85,7 +85,9 @@ public class APIController {
     // 목록 서비스 요청
     // 각 경로에 따라 특정한 권한을 가진 사용자만 접근가능 하도록 허용하는 어노테이션
     // => CustomSecurityConfig.java소스에 @EnableMethodSecurity어노테이션을 설정해야함.
-    //@PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
+    // => @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')") // Test 정상처리됨
+    // => @PreAuthorize("hasRole('ROLE_USER') and principal.username=='user1@test.com' ") // Test 정상처리됨
+
     @GetMapping("/list")  // url = "/api/v1/todos/list?page=1&size=10"
     public ResponseEntity<?> list(@Validated PageRequestDTO pageRequestDTO){
         log.info("List Todos: {}", pageRequestDTO);
