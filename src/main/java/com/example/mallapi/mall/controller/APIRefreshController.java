@@ -21,7 +21,7 @@ public class APIRefreshController {
             @RequestHeader(value = "Authorization") String authHeader,
             @RequestParam("refreshToken") String refreshToken) {
 
-        log.info("access token with Bearer...."+authHeader);
+        log.info("Access Token With Bearer....{}",authHeader);
 
         // 1. Refresh Token 존재 여부 확인: 요청에 Refresh Token이 포함되지 않았다면 예외를 발생
         if (refreshToken == null){
