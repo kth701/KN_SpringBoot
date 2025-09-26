@@ -65,6 +65,8 @@ public class CustomSecurityConfig {
         // 요청 경로별 인가 설정
 //        http.authorizeHttpRequests(authorize -> {
 //            authorize.requestMatchers("/api/member/login", "/api/member/join").permitAll();
+//            // 로그인 및 토큰 재발급 경로는 모두에게 허용
+//            authorize.requestMatchers("/api/member/login", "/api/member/refresh","/api/member/kakao").permitAll();
 //
 //            // 그 외 모든 요청은 인증된 사용자만 접근 가능
 //            authorize.anyRequest().authenticated();

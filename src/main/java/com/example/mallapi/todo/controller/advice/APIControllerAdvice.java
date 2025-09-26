@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.example.mallapi.util.CustomJWTException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -94,5 +95,20 @@ public class APIControllerAdvice {
      */
 
 
+
+    /**
+     * JWT 관련 예외(`CustomJWTException`)가 발생했을 때 처리하는 핸들러
+     * 토큰이 만료되었거나, 형식이 잘못되었거나, 서명이 유효하지 않은 경우 등에 호출
+     *
+     * @param e 발생한 `CustomJWTException` 객체
+     * @return HTTP 401 Unauthorized 상태 코드와 오류 메시지를 담은 `ResponseEntity`
+     */
+    @ExceptionHandler(CustomJWTException.class)
+    public ResponseEntity<?> handleJWTException(CustomJWTException e) {
+        log.error("CustomJWTException: {}", e.getMessage());
+
+        // HTTP 상태 코드 401 (Unauthorized)와 함께 오류 메시지를 담은 Map을 응답 본문으로 반환
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("error", e.getMessage()));
+    }
 
 }
