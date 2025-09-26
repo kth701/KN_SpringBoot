@@ -63,7 +63,7 @@ public class APIRefreshController {
 
         // 6. Refresh Token의 유효시간 checkTime()메서드를 통해 1시간 미만 여부 체크해서
         //     1시간 미만이면 new refresh token생성
-        String newRefreshToken = checkTime( 60L)
+        String newRefreshToken = checkTime( (long)claims.get("exp"))
                 // refresh token이 1시간 미만이면 new refresh token생성
                 ? JWTUtil.generateToken(claims, 60*24)
                 // 1시간 이상이면 기존 refresh token 그대로 사용

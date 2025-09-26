@@ -80,8 +80,11 @@ public class CustomSecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
+
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        //configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000")); // 특정 도메인에 한 해서 허용
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         //configuration.setAllowedHeaders(Arrays.asList("*"));
