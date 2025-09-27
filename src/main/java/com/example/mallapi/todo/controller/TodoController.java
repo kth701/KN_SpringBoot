@@ -1,19 +1,20 @@
 package com.example.mallapi.todo.controller;
 
-import com.example.mallapi.mall.domain.Member;
-import com.example.mallapi.todo.dto.TodoDTO;
-import com.example.mallapi.todo.service.TodoService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import com.example.mallapi.todo.dto.TodoDTO;
+import com.example.mallapi.todo.service.TodoService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Controller
 @RequestMapping("/todos") // URL 경로 구분을 위해 클래스 레벨에 @RequestMapping 추가
@@ -33,6 +34,18 @@ public class TodoController {
 
         //model객체 유지한체로 thymeleafEx/ex01.html로 이동
         return "thymeleafEx/ex01";
+    }
+    @GetMapping("/ex2")
+    public String ex2(String username, String password, Model model) {
+        log.info("--> 타임리프 매개변수 전달 테스트");
+        log.info("username={}", username);
+        log.info("password={}", password);
+
+        model.addAttribute("username", username);
+        model.addAttribute("password", password);
+
+        //model객체 유지한체로 thymeleafEx/ex01.html로 이동
+        return "thymeleafEx/mainsub";
     }
 
     @GetMapping("/main")
