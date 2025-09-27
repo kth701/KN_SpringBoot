@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.mallapi.todo.dto.PageRequestDTO;
+import com.example.mallapi.todo.dto.PageResponseDTO;
 import com.example.mallapi.todo.dto.TodoDTO;
 import com.example.mallapi.todo.service.TodoService;
 
@@ -53,7 +55,7 @@ public class TodoController {
         model.addAttribute("message", "TodoController에서 보낸 메시지입니다.");
 
         //model객체 유지한체로 thymeleafEx/ex01.html로 이동
-        return "thymeleafEx/main";
+        return "template_webpage/main";
     }
     @GetMapping("/mainsub")
     public String subpage(Model model) {
@@ -76,8 +78,42 @@ public class TodoController {
 
 
         //model객체 유지한체로 thymeleafEx/ex01.html로 이동
-        return "thymeleafEx/mainsub";
+        return "template_webpage/mainsub";
     }
+
+
+
+    /*
+     * Todo Controller 맵핑
+     */
+
+    // Todo Register Form
+    @GetMapping("/register")
+    public String register(Model model) {
+        return "todo/register"; // resources/templates/todo/register.html
+    }
+
+    // Login Form
+    @GetMapping("/login")
+    public String register() {
+        return "todo/login"; // resources/templates/todo/register.html
+    }
+    
+    // Todo List
+    @GetMapping("/list")
+    public String list(PageRequestDTO pageReqeustDTO,Model model) {
+
+        PageResponseDTO<TodoDTO> pageResponseDTO 
+                                = todoService.getTodoList(pageReqeustDTO);
+
+        model.addAttribute("todoDTOList", pageResponseDTO.getDtoList());
+        model.addAttribute("pageResponseDTO", pageResponseDTO);
+
+        return "todo/list"; // resources/templates/todo/list.html
+    }
+
+
+
 
     /**
      * Todo 상세 조회 메서드

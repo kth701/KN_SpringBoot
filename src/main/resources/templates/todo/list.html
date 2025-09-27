@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko" 
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultrag.net.nz/.thymeleaf/layout"
+    layout:decorate="~{layouts/base}">
+
+    <!-- 1. 페이지별 컨텐츠 -->
+    <div layout:fragment="content" class="container my-3">
+
+        <div id="todo" class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">Todo List</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Writer</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="todoDto, status: ${todoDTOList}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${status.index}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${todoDto.getTitle()}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${todoDto.getWriter()}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${todoDto.getDueDate()}"></td>
+                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+
+        <!-- 페이징처리 시작 -->
+        <!-- <div th:if="${!paging.isEmpty()}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
+                    <a class="page-link" th:href="@{|?page=${paging.number-1}|}">이전</a>
+                </li>
+                <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+                    th:if="${page >= paging.number-5 and page <= paging.number+5}"
+                    th:classappend="${page == paging.number} ? 'active'"
+                    class="page-item">
+                    <a th:text="${page+1}" class="page-link" th:href="@{|?page=${page}|}"></a>
+                </li>
+                <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
+                    <a class="page-link" th:href="@{|?page=${paging.number+1}|}">다음</a>
+                </li>
+            </ul>
+        </div> -->
+        <!-- 페이징처리 끝 -->
+        <!-- <a th:href="@{/todo/register}" class="btn btn-primary">Todo 등록하기</a> -->
+    </div>
+
+    <!-- 2. 페이지별 스타일 -->
+    <style layout:fragment="current_css">
+        /* 현재 페이지 스타일 적용 */
+        /* * { color: red;} */
+    </style>
+    
+    <!-- 3. 페이지별 JS -->
+    <script layout:fragment="current_js">
+        /* 현재 페이지 JS 적용 */
+        // console.log('todo list javascript!!!')
+    </script>
+
+</html>
+
+
+
+</html>

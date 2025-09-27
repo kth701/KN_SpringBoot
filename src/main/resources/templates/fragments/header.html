@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <!-- Header -->
+    
+<!-- Header -->
 <div th:fragment="navbar">
     <header class="bg-white shadow-md sticky top-0 z-50">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -23,28 +24,28 @@
 <!-- Sidebar -->
 <div th:fragment="sidebar">
     
-    <aside class="md:w-1/4 lg:w-1/5 pr-8">
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <div class="mb-8">
-                <h3 class="text-xl font-bold mb-4 border-b pb-2">Categories</h3>
-                <ul>
-                    <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">Electronics</a></li>
-                    <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">Apparel</a></li>
-                    <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">Books</a></li>
-                    <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">Home Goods</a></li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-xl font-bold mb-4 border-b pb-2">Filter by Price</h3>
-                <ul>
-                    <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">$0 - $50</a></li>
-                    <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">$50 - $100</a></li>
-                    <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">$100 - $200</a></li>
-                    <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">$200+</a></li>
-                </ul>
-            </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="mb-8">
+            <h3 class="text-xl font-bold mb-4 border-b pb-2">Categories</h3>
+            <ul>
+                <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">Electronics</a></li>
+                <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">Apparel</a></li>
+                <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">Books</a></li>
+                <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">Home Goods</a></li>
+            </ul>
         </div>
-    </aside>
+        <div>
+            <h3 class="text-xl font-bold mb-4 border-b pb-2">Filter by Price</h3>
+            <ul>
+                <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">$0 - $50</a></li>
+                <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">$50 - $100</a></li>
+                <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">$100 - $200</a></li>
+                <li class="mb-2"><a href="#" class="text-gray-600 hover:text-gray-900">$200+</a></li>
+            </ul>
+        </div>
+    </div>
+
 </div>
 
 <div th:fragment="test2">

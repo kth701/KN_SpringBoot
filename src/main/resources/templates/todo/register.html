@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko" 
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultrag.net.nz/.thymeleaf/layout"
+    layout:decorate="~{layouts/base}">
+
+    <!-- 1. 페이지별 컨텐츠 -->
+    <div layout:fragment="content"  >
+        <div class="container w-4/5 mx-auto p-4">
+            <h3 class="text-3xl font-bold mb-6 text-gray-800">Todo Register Page</h3>
+
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <div class="text-xl font-semibold mb-4 text-gray-700">Todo Register</div>
+                <div class="p-0 ">
+                    <form th:action="@{/todo/register}" method="post" class="space-y-4">
+                        <div class="flex items-center border border-gray-300 rounded-md overflow-hidden">
+                            <span class="px-4 py-2 bg-gray-100 text-gray-700 font-medium w-32">Tno</span>
+                            <input type="text" name="tno" class="flex-1 p-2 focus:outline-none bg-gray-50" readonly>
+                        </div>
+
+                        <div class="flex items-center border border-gray-300 rounded-md overflow-hidden">
+                            <span class="px-4 py-2 bg-gray-100 text-gray-700 font-medium w-32">Title</span>
+                            <input type="text" name="title" class="flex-1 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Title">
+                        </div>
+
+                        <div class="flex items-center border border-gray-300 rounded-md overflow-hidden">
+                            <span class="px-4 py-2 bg-gray-100 text-gray-700 font-medium w-32">Writer</span>
+                            <input type="text" name="writer" class="flex-1 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Writer">
+                        </div>
+
+                        <div class="flex items-center border border-gray-300 rounded-md overflow-hidden">
+                            <span class="px-4 py-2 bg-gray-100 text-gray-700 font-medium w-32">DueDate</span>
+                            <input type="date" name="dueDate" class="flex-1 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div class="flex items-center border border-gray-300 rounded-md overflow-hidden">
+                            <span class="px-4 py-2 bg-gray-100 text-gray-700 font-medium w-32">Complete</span>
+                            <div class="flex items-center p-2">
+                                <input class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500" type="checkbox" role="switch" name="complete" id="completeCheck">
+                                <label class="ml-2 text-gray-700" for="completeCheck">Complete</label>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <div class="flex justify-end space-x-3">
+                                <button type="reset" class="px-4 py-2 bg-gray-500 text-white font-semibold rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75">Reset</button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">Register</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <div class="flex justify-end">
+                <a th:href="@{/todo/list}" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75">List</a>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- 2. 페이지별 스타일 -->
+    <style layout:fragment="current_css">
+        /* Tailwind CSS is utility-first, so most styling is done directly in the HTML classes. */
+        /* If you need custom CSS that cannot be achieved with Tailwind, add it here. */
+    </style>
+    
+    <!-- 3. 페이지별 JS -->
+    <script layout:fragment="current_js">
+        /* 현재 페이지 JS 적용 */
+        // console.log('todo list javascript!!!')
+    </script>
+
+</html>
+
+
+
+</html>
