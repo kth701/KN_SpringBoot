@@ -19,12 +19,19 @@ public class APILoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("--- APILoginSuccessHandler ---");
         log.info("--> Authentication: {}", authentication);
+        log.info("---------------");
+        log.info("=>1. authentication.toString(): {} ",authentication.toString());
+        log.info("=>2. authentication.username(): {}",authentication.getName());
+        log.info("=>3. authentication.getAuthorities(): {}",authentication.getAuthorities());
+        log.info("=>4. authentication.getPrincipal(): {}",authentication.getPrincipal());
+        log.info("---------------");
         log.info("--> (MemberDTO) authentication.getPrincipal(): {}",(MemberDTO) authentication.getPrincipal());
         log.info("---------------");
 
 
         // 로그인 성공 -> JWT발급 ->클라이언트에 보내기
         MemberDTO memberDTO = (MemberDTO) authentication.getPrincipal();
+        log.info("=>5. memberSecurityDTO.getNickname(): {}",memberDTO.getNickname());
 
         Map<String, Object> claims = memberDTO.getClaims();
         // JWT 발급
@@ -43,6 +50,10 @@ public class APILoginSuccessHandler implements AuthenticationSuccessHandler {
         response.getWriter().print(json);
         response.getWriter().flush();
         response.getWriter().close();
+
+        // 로그인 성공후 후처리 작업한 뒤 마지막 보여질 View
+        response.sendRedirect("/");
+
 
     }
 }
