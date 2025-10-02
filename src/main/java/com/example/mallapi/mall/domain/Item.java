@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="Item")
+@Table(name="item")
 @Getter
 @Setter
 @ToString//@ToString(callSuper = true)
