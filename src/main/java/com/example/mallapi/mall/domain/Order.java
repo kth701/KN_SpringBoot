@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name="orders")
 @Getter
 @Setter
-public class Order {
+public class Order extends BaseEntity {
     @Id // 기본키 설정
     @GeneratedValue(strategy = GenerationType.IDENTITY)// auto_incrument 적용
     @Column(name="order_id")
@@ -40,8 +40,8 @@ public class Order {
             fetch = FetchType.LAZY) // 필요시 연결(속도 개선)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    private LocalDateTime regTime;
-    private LocalDateTime updateTime;
+//    private LocalDateTime regTime;
+//    private LocalDateTime updateTime;
 
 }
 

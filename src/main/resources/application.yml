@@ -19,6 +19,7 @@ spring:
         format_sql: true # SQL 쿼리 포맷팅 활성화
         hibernate: org.hibernate.dialect.MariaDBDialect # MariaDB 방언 설정
 
+
 logging:
   level:
     org:

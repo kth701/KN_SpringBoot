@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Table(name="order_item")
 @Getter
 @Setter
-public class OrderItem {
+public class OrderItem extends BaseEntity {
     @Id // 기본키 설정
     @GeneratedValue(strategy = GenerationType.IDENTITY)// auto_incrument 적용
     @Column(name="order_item_id")
@@ -30,8 +30,8 @@ public class OrderItem {
     private int orderPrice;// 주문 가격
     private int count;// 수량
 
-    private LocalDateTime regTime;
-    private LocalDateTime updateTime;
+//    private LocalDateTime regTime;
+//    private LocalDateTime updateTime;
 
 }
 /*

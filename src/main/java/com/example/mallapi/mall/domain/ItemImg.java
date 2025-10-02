@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter@Setter
 @NoArgsConstructor@AllArgsConstructor
 @Builder
-public class ItemImg {
+public class ItemImg extends BaseEntity{
     @Id
     @Column(name = "item_img_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,8 +25,8 @@ public class ItemImg {
 
     private String repimgYn; // 대표 이미지 여부
 
-    private LocalDateTime regTime; // 등록 시간
-    private LocalDateTime updateTime; // 수정시간
+//    private LocalDateTime regTime; // 등록 시간
+//    private LocalDateTime updateTime; // 수정시간
 
     // 하나의 상품은 여러 상품 이미지를 가질 수 있는 관계 맵핑
     @ManyToOne(fetch = FetchType.LAZY) // 지연 로딩(상품 이미지는 필요한 시점에 호출)
