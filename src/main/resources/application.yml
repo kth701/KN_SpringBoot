@@ -45,10 +45,17 @@ logging:
         test: info
 
 # 사용자 정의 업로드 경로 설정
-# 프로젝트 루트 디렉토리의 'upload'폴더
+
 com:
   example:
     mallapi:
       upload:
-        path: upload
+        # 1. 방식: # 프로젝트 루트 디렉토리의 'upload'폴더
+        #path: upload
+
+        # 2. 방식:
+        # 상품이미지가 실제로 저장될 파일 시스템 경로(프로젝트에서 이미지 업로드시 사용되는 경로)
+        itemImgLocation: c:/upload/item
+        # 리소스 핸들러가 파일 시스템에 접근하기 위해 사요
+        uploadPath: file:///c:upload/
 
