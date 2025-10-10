@@ -1,0 +1,38 @@
+spring:
+  # Test Datasource (H2 In-Memory)
+  datasource:
+#    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE # 정상
+    url: jdbc:h2:mem:test  # 정상
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # Test JPA
+  jpa:
+    hibernate:
+      ddl-auto: create-drop # 테스트 시작 시 스키마 생성, 종료 시 삭제
+    properties:
+      hibernate:
+        format_sql: true
+        # H2 데이터베이스 방언 설정
+        dialect: org.hibernate.dialect.H2Dialect
+    show-sql: true
+
+# yml형식 주의
+# test>resources>application-test.yml
+# 테스트용 사용자 정의 업로드 경로
+com:
+  example:
+    mallapi:
+      upload:
+        itemImgLocation: C:/upload/item
+        uploadPath: file:///C:/upload
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql: trace

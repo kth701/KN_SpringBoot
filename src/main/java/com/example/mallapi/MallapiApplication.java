@@ -4,8 +4,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
+// MallapiApplication.java 파일에 scanBasePackages 속성을 추가하여 com.example.mallapi 패키지 전체를 스캔하도록 명시
 //@SpringBootApplication
-@SpringBootApplication(exclude = SecurityAutoConfiguration.class)// security로그인 화면 숨기기 어노테이션
+@SpringBootApplication(
+	scanBasePackages = "com.example.mallapi",
+	exclude = SecurityAutoConfiguration.class       // security로그인 화면 숨기기 어노테이션
+)
 public class MallapiApplication {
 
 	

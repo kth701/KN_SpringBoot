@@ -47,8 +47,8 @@ public class ItemRepositoryTest {
                     .itemDetail("테스트 상품 상세 설명"+i)
                     .itemSellStatus(ItemSellStatus.SELL)
                     .stockNumber(100)
-                    .regTime(LocalDateTime.now())       // 속성 상속시 builder()적용 안됨.
-                    .updateTime(LocalDateTime.now()) // 속성 상속시 builder()적용 안됨.
+//                    .regTime(LocalDateTime.now())       // 속성 상속시 builder()적용 안됨.
+//                    .updateTime(LocalDateTime.now()) // 속성 상속시 builder()적용 안됨.
                     .build();
 
             item.setRegTime(LocalDateTime.now());

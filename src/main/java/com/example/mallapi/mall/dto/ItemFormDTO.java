@@ -4,23 +4,36 @@ package com.example.mallapi.mall.dto;
 
 import com.example.mallapi.constant.ItemSellStatus;
 import com.example.mallapi.mall.domain.Item;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import org.modelmapper.ModelMapper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
+@Setter@ToString
 @NoArgsConstructor
 public class ItemFormDTO {
     private Long id;
+
+    @NotBlank(message = "상품명은 필수 입력 값입니다.")
     private String itemNm; // 상품명
+
+    @NotNull(message = "가격은 필수 입력 값입니다.")
     private Integer price; // 가격
+
+    @NotBlank(message = "상품 상세 내용은 필수 입력 값입니다.")
     private String itemDetail; // 상품 상세 설명
+
+    @NotNull(message = "재고 수량은 필수 입력 값입니다.")
     private Integer stockNumber; // 재고수량
-    private String itemSellStatus; // 상품 판매 상태
+
+    private ItemSellStatus itemSellStatus; // 상품 판매 상태
 
     private List<ItemImgDTO> itemImgDTOList = new ArrayList<>(); // 상품 이미지 리스트
 
@@ -30,6 +43,20 @@ public class ItemFormDTO {
     private List<Long> itemImgIds = new ArrayList<>();
 
 
+    // 1. ModelMapper 적용
+    // Item Entity <-> DTO
+    private static ModelMapper modelMapper = new ModelMapper();
+    public static ItemFormDTO itemFormDtoOf(Item item){
+        // Item Entity -> DTO
+        return modelMapper.map(item, ItemFormDTO.class);
+    }
+    // DTO -> Item Entity
+    public Item createItem(){
+        return modelMapper.map(this, Item.class);
+    }
+
+
+    // 2. 직접 작성
 
     // item dto -> entity
     public Item toEntity() {
@@ -53,7 +80,7 @@ public class ItemFormDTO {
         itemFormDTO.setPrice(item.getPrice());
         itemFormDTO.setItemDetail(item.getItemDetail());
         itemFormDTO.setStockNumber(item.getStockNumber());
-        itemFormDTO.setItemSellStatus(item.getItemSellStatus().toString());
+        itemFormDTO.setItemSellStatus(item.getItemSellStatus());
 
         return itemFormDTO;
     }

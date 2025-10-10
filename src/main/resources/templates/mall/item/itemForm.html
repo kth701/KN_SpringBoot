@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+
+<!-- 1. 페이지별 컨텐츠 -->
+<div layout:fragment="content">
+    <div class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <div class="bg-white p-8 md:p-12 rounded-lg shadow-lg border border-gray-200">
+            <h1 class="text-3xl font-bold text-gray-900 mb-10">상품 관리</h1>
+<!--            <div>-->
+<!--                <div>[[${itemFormDTO}]]</div>-->
+<!--                <hr/>-->
+<!--            </div>-->
+
+            <form method="post" th:object="${itemFormDTO}" enctype="multipart/form-data">
+                <input type="hidden" th:field="*{id}"/>
+                <div class="space-y-8">
+
+                    <!-- 상품 판매 상태 -->
+                    <div>
+                        <label for="itemSellStatus" class="block text-sm font-medium text-gray-700 mb-2">상품 상태</label>
+                        <select id="itemSellStatus" th:field="*{itemSellStatus}" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm">
+                            <option value="SELL">판매중</option>
+                            <option value="SOLD_OUT">품절</option>
+                        </select>
+                    </div>
+
+                    <!-- 상품명 -->
+                    <div>
+                        <label for="itemNm" class="block text-sm font-medium text-gray-700 mb-2">상품명</label>
+                        <input type="text" id="itemNm" th:field="*{itemNm}" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm" placeholder="상품명을 입력하세요.">
+                        <p th:if="${#fields.hasErrors('itemNm')}" th:errors="*{itemNm}" class="text-xs text-red-500 mt-2"></p>
+                    </div>
+
+                    <!-- 가격 -->
+                    <div>
+                        <label for="price" class="block text-sm font-medium text-gray-700 mb-2">가격</label>
+                        <input type="number" id="price" th:field="*{price}" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm" placeholder="가격을 입력하세요.">
+                        <p th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-xs text-red-500 mt-2"></p>
+                    </div>
+
+                    <!-- 재고 -->
+                    <div>
+                        <label for="stockNumber" class="block text-sm font-medium text-gray-700 mb-2">재고 수량</label>
+                        <input type="number" id="stockNumber" th:field="*{stockNumber}" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm" placeholder="재고 수량을 입력하세요.">
+                        <p th:if="${#fields.hasErrors('stockNumber')}" th:errors="*{stockNumber}" class="text-xs text-red-500 mt-2"></p>
+                    </div>
+
+                    <!-- 상품 상세 설명 -->
+                    <div>
+                        <label for="itemDetail" class="block text-sm font-medium text-gray-700 mb-2">상품 상세 설명</label>
+                        <textarea id="itemDetail" th:field="*{itemDetail}" rows="6" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm" placeholder="상품에 대한 상세 설명을 입력하세요."></textarea>
+                        <p th:if="${#fields.hasErrors('itemDetail')}" th:errors="*{itemDetail}" class="text-xs text-red-500 mt-2"></p>
+                    </div>
+
+                    <!-- 상품 이미지 (신규 등록일 경유 itemImgDTOList가 텅빈 상태) -->
+                    <div th:if="${#lists.isEmpty(itemFormDTO.itemImgDTOList)}" class="space-y-4 pt-4 border-t border-gray-200">
+                        <h3 class="text-base font-medium text-gray-900">상품 이미지</h3>
+                        <div th:each="num : ${#numbers.sequence(1,5)}">
+                            <label th:for="'itemImgFile'+${num}" class="block text-sm font-medium text-gray-700 mb-2" th:text="'이미지 ' + ${num}"></label>
+                            <input type="file" class="file-input  block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" name="itemImgFile" th:id="'itemImgFile'+${num}"/>
+                        </div>
+                    </div>
+
+                    <!-- 상품 이미지 (수정일 경유 itemImgDTOList가 텅빈 상태가 아님) -->
+                    <div th:if="${not #lists.isEmpty(itemFormDTO.itemImgDTOList)}" class="space-y-6 pt-4 border-t border-gray-200">
+                        <h3 class="text-base font-medium text-gray-900">상품 이미지 수정</h3>
+                        <div th:each="itemImgDTO, status : ${itemFormDTO.itemImgDTOList}" class="p-4 border rounded-lg shadow-sm">
+                            <div class="flex items-center gap-x-6">
+                                <div class="flex-shrink-0">
+                                    <img th:if="${not #strings.isEmpty(itemImgDTO.imgUrl)}" th:src="${itemImgDTO.imgUrl}" class="h-24 w-24 rounded-lg object-cover" alt="상품 이미지 미리보기">
+                                    <div th:unless="${not #strings.isEmpty(itemImgDTO.imgUrl)}" class="h-24 w-24 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500">이미지 없음</div>
+                                </div>
+                                <div class="flex-grow">
+                                    <p class="text-sm text-gray-600 mb-2" th:text="${not #strings.isEmpty(itemImgDTO.oriImgName)} ? ${itemImgDTO.oriImgName} : '상품이미지 ' + ${status.index+1}"></p>
+                                    <input type="file" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" name="itemImgFile">
+                                    <input type="hidden" name="itemImgIds" th:value="${itemImgDTO.id}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-10 pt-6 border-t border-gray-200 flex justify-end gap-x-4">
+                    <!-- 상품 등록 -->
+                    <div th:if="${#strings.isEmpty(itemFormDTO.id)}">
+                        <button th:formaction="@{/admin/item/new}" type="submit" class="rounded-md bg-indigo-600 py-2.5 px-8 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors duration-200">저장</button>
+                    </div>
+                    <!-- 상품 수정 -->
+                    <div th:unless="${#strings.isEmpty(itemFormDTO.id)}" class="flex gap-x-4">
+                        <a th:href="@{'/admin/item/'+${itemFormDTO.id}}" class="rounded-md bg-white py-2.5 px-6 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-colors duration-200">취소</a>
+                        <button th:formaction="@{'/admin/item/'+${itemFormDTO.id}}" type="submit" class="rounded-md bg-indigo-600 py-2.5 px-8 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors duration-200">수정</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- 현재 페이지에서만 사용하는 CSS정의 -->
+<style layout:fragment="mystyle"  th:inline="css">
+    .filedError {
+      color: red;
+      font-size: 0.8em;
+
+
+      padding: 0.2em;
+      padding-left:1em; padding-right: 1em;
+    }
+
+</style>
+
+<!-- 현재 페이지에서만 사용하는 javasscript 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+    console.log('itemForm javascript!!!')
+
+    // ----------------------------------------------------------- //
+    // 1. 대표이미지(첫번째 이미지)가 없을 경우 에러 메시지 처리
+    //    itemController에서 저장한 에러메시지 객체
+   // ----------------------------------------------------------- //
+    const errorMessage = [[${errorMessage}]]
+    console.log(errorMessage)
+
+    if (errorMessage != null) // 에러 메시지가 있으면 alert()메서드로 에러 메시지 처리
+        alert(errorMessage)
+
+
+    // ----------------------------------------------------------- //
+    // 3. jQuery 활용 이미지 파일 체크
+    // ----------------------------------------------------------- //
+
+
+    $(function(){
+      console.log('jQuery Loaded ... success!!!');
+
+      // 파일 첨부시 이미지 파일인지 체크
+      bindDomEventJQuery()
+    });
+
+    function bindDomEventJQuery(){
+      $(".file-input").on('change', function(){
+        console.log('file change event...')
+
+        console.log('첨부파일이름:',$(this).val());
+        let fileName = $(this).val().split("\\").pop();
+        console.log(fileName)
+
+        let fileExt = fileName.substring(fileName.lastIndexOf(".")+1)
+        fileExt = fileExt.toLowerCase()
+
+        // 파일 유형 체크
+        if (fileExt != "jpg" && fileExt != "jpeg" &&
+            fileExt != "gif" && fileExt != "png" && fileExt !="bmp" ){
+            //alert("이미지 파일만 등록 가능합니다.")
+            $(this).siblings('.file_label').html('이미지 파일만 등록이 가능합니다.')
+            return
+        }// end if
+
+        $(this).siblings('.file_label').html(fileName)
+
+      }); // file change event function
+
+
+    }
+
+
+
+
+/*
+    // ----------------------------------------------------------- //
+    // 2. JavaScript
+    // ----------------------------------------------------------- //
+    // 2.1 첨부파일이 이미지형식인 파일인지 체크
+    // ----------------------------------------------------------- //
+    // fileInput: 배열 구조
+
+    const fileInputTest = document.querySelectorAll('.file-input');
+    console.log(fileInputTest)
+
+    const fileInput = document.querySelectorAll('.file-input');
+    const fileLabel = fileInput.previousElementSibling;
+
+    // ----------------------------------------------------------- //
+    // 2.2 이미지 파일 형식 체크하는 함수(메서드) 호출
+    // ----------------------------------------------------------- //
+    bindDomEventJS();
+    function bindDomEventJS(){
+
+        for ( const f of fileInput ){
+
+            f.addEventListener('change', (e) =>{
+              console.log('file change:',e.target)
+
+              // 2.1 첨부파일 선택시 파일 경로를 제외한 파일명.확장자만 추출
+              //console.log(e.target.value.split("\\"))
+              let fileName = e.target.value.split("\\").pop(); // 마지막에 있는 배열 추출(파일명.확장자)
+              console.log(fileName);
+
+              // 2.2 파일 형식 체크 : 확장자만 추출
+              let fileExt = fileName.substring(fileName.lastIndexOf(".")+1)
+              console.log(fileExt)
+              // 2.3 소문자 전환
+              fileExt = fileExt.toLowerCase()
+
+              if (fileExt != "jpg" && fileExt != "jpeg" &&
+                  fileExt != "gif" && fileExt != "png" && fileExt !="bmp" ){
+                  alert("이미지 파일만 등록 가능합니다.")
+                  return
+              }
+
+              // 선택한 상품이미지 이름 표시
+              e.target.previousElementSibling.innerHTML = fileName
+              //e.target.nextElementSibling.innerHTML = fileName
+          }); //end addEventListener
+
+      } // end for
+
+    }
+
+*/
+
+
+
+
+
+
+</script>
+
+
+</html>

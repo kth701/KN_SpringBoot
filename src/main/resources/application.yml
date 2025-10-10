@@ -1,3 +1,9 @@
+
+
+#  주의: test resource 파일 위치
+# test > resources > application-test.yml
+
+
 server:
   port: 8099 # 서버 포트 설정
 spring:
@@ -19,7 +25,7 @@ spring:
         format_sql: true # SQL 쿼리 포맷팅 활성화
         hibernate: org.hibernate.dialect.MariaDBDialect # MariaDB 방언 설정
         default_batch_fetch_size: 1000 # 기본 batch size 설정
-  sevlet:
+  servlet:
     multipart:
       enabled: true # 파일 업로드 활성화
       max-file-size: 2MB # 개별 파일의 최대 크기(20MB)
@@ -50,12 +56,17 @@ com:
   example:
     mallapi:
       upload:
-        # 1. 방식: # 프로젝트 루트 디렉토리의 'upload'폴더
+        # 1. 방식: # 프로젝트 내부에 이미지 저장 => 프로젝트 루트(root) 디렉토리의 '/upload'폴더
         #path: upload
 
-        # 2. 방식:
-        # 상품이미지가 실제로 저장될 파일 시스템 경로(프로젝트에서 이미지 업로드시 사용되는 경로)
+        # 2. 방식: 프로젝트 내부가 아닌 자신의 컴퓨터에서 파일을 찾는 경로로 uploadPath로 설정
+        # 상품이미지가 실제로 저장될 파일 시스템 경로(프로젝트에서 이미지 업로드시 사용되는 경로=> 이미지 URL)
+        # 'c:/upload/item''폴더없으면 생성
         itemImgLocation: c:/upload/item
-        # 리소스 핸들러가 파일 시스템에 접근하기 위해 사요
-        uploadPath: file:///c:upload/
+        # 리소스 핸들러가 파일 시스템에 접근하기 위해 사용
+        # 웹어플리케이션에서 img src처리 사용될 url 경로로 WebMvcConfigurer으로 부터 구현한
+        # CustomServletConfig.java의 addResourceHandlers()메서드에서 설정한 uploadPath변수에 1:1 맵핑될 이미지 url설정
+        uploadPath: file:///c:/upload
+
+
 

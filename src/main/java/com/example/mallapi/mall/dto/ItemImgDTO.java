@@ -39,7 +39,7 @@ public class ItemImgDTO {
         this.imgName = itemImg.getImgName();
         this.oriImgName = itemImg.getOriImgName();
         this.imgUrl = itemImg.getImgUrl();
-        this.repimgYn = itemImg.getRepimgYn();
+        this.repimgYn = itemImg.getRepImgYn();
     }
     // DTO -> Entity 전환:
     public ItemImg toEntity(){
@@ -48,7 +48,7 @@ public class ItemImgDTO {
                 .imgName(imgName)
                 .oriImgName(oriImgName)
                 .imgUrl(imgUrl)
-                .repimgYn(repimgYn)
+                .repImgYn(repimgYn)
                 .build();
     }
 

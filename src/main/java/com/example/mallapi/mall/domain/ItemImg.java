@@ -4,8 +4,6 @@ package com.example.mallapi.mall.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name="item_img")
 @Getter@Setter
@@ -23,7 +21,7 @@ public class ItemImg extends BaseEntity{
 
     private String imgUrl; // 이미지 조회 경로
 
-    private String repimgYn; // 대표 이미지 여부
+    private String repImgYn; // 대표 이미지 여부
 
 //    private LocalDateTime regTime; // 등록 시간
 //    private LocalDateTime updateTime; // 수정시간

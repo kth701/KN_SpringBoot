@@ -29,6 +29,11 @@
             color: #333;
             font-weight: 500;
         }
+        #quick-menu {
+            position: absolute;
+            right: 0;
+            transform: translateY(-50%);
+        }
     </style>
 </head>
 <body class="bg-white text-gray-700">
@@ -83,7 +88,7 @@
     </div>
 
     <!-- 퀵메뉴 -->
-    <aside class="fixed top-1/2 right-0 transform -translate-y-1/2 z-40">
+    <aside id="quick-menu" class="z-30">
         <div class="bg-white border border-gray-200 rounded-l-md shadow-lg">
             <ul class="text-center text-xs font-medium">
                 <li><a href="#" class="block py-3 px-4 hover:bg-gray-50">MYPAGE</a></li>
@@ -396,7 +401,7 @@
             // 퀵메뉴 최상단으로 이동
             $('#quick-menu-top').on('click', function(e) {
                 e.preventDefault();
-                $('html, body').animate({ scrollTop: 0 }, 'smooth');
+                $('html, body').animate({ scrollTop: 0 }, 500);
             });
 
             // 초기 탭 설정
@@ -454,6 +459,24 @@
             $('#hero-slider').on('mouseenter', stopSlider).on('mouseleave', startSlider);
 
             startSlider(); // 페이지 로드 시 슬라이더 시작
+
+            // 퀵메뉴 스크롤 애니메이션
+            var $quickMenu = $('#quick-menu');
+            if ($quickMenu.length) {
+                // 초기 위치를 화면 중앙으로 설정
+                var initialTop = ($(window).height() - $quickMenu.outerHeight()) / 2;
+                $quickMenu.css('top', initialTop);
+
+                $(window).scroll(function() {
+                    var scrollTop = $(this).scrollTop();
+                    var targetTop = scrollTop + initialTop;
+
+                    // .stop()을 사용하여 애니메이션 큐가 쌓이는 것을 방지
+                    $quickMenu.stop().animate({
+                        top: targetTop
+                    }, 400, 'swing'); // 400ms 속도
+                }).scroll(); // 페이지 로드 시 위치를 잡기 위해 스크롤 이벤트 트리거
+            }
         });
     </script>
 
