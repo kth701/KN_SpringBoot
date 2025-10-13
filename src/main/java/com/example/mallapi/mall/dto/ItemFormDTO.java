@@ -6,10 +6,7 @@ import com.example.mallapi.constant.ItemSellStatus;
 import com.example.mallapi.mall.domain.Item;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.modelmapper.ModelMapper;
 
 import java.util.ArrayList;
@@ -18,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter@ToString
 @NoArgsConstructor
+@AllArgsConstructor
 public class ItemFormDTO {
     private Long id;
 
@@ -42,11 +40,12 @@ public class ItemFormDTO {
     // 수정시에 이미지 아이디를 담아둘 용도로 사용
     private List<Long> itemImgIds = new ArrayList<>();
 
-
+    // ------------------------------- //
     // 1. ModelMapper 적용
+    // ------------------------------- //
     // Item Entity <-> DTO
     private static ModelMapper modelMapper = new ModelMapper();
-    public static ItemFormDTO itemFormDtoOf(Item item){
+    public static ItemFormDTO of(Item item){
         // Item Entity -> DTO
         return modelMapper.map(item, ItemFormDTO.class);
     }
@@ -55,9 +54,9 @@ public class ItemFormDTO {
         return modelMapper.map(this, Item.class);
     }
 
-
+    // ------------------------------- //
     // 2. 직접 작성
-
+    // ------------------------------- //
     // item dto -> entity
     public Item toEntity() {
         return Item.builder()
@@ -72,7 +71,17 @@ public class ItemFormDTO {
     }
 
     // item entity -> DTO
-    public static ItemFormDTO of(Item item) {
+    // 생성자 활용
+    public ItemFormDTO(Item item){
+        this.setId(item.getId());
+        this.setItemNm(item.getItemNm());
+        this.setPrice(item.getPrice());
+        this.setItemDetail(item.getItemDetail());
+        this.setStockNumber(item.getStockNumber());
+        this.setItemSellStatus(item.getItemSellStatus());
+    }
+    // 일반 메서드 활용
+    public static ItemFormDTO itemFormDtoOf(Item item) {
         ItemFormDTO itemFormDTO = new ItemFormDTO();
 
         itemFormDTO.setId(item.getId());

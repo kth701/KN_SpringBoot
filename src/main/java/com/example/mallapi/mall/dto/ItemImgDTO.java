@@ -8,17 +8,20 @@ import lombok.*;
 import org.modelmapper.ModelMapper;
 
 @Getter@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ItemImgDTO {
     private Long id; // 상품 이미지 식별ID(PK)
     private String imgName; // 상품 이미지 파일명
     private String oriImgName; // 상품 원본 이미지 파일명
     private String imgUrl; // 이미지 조회 경로
 
-    private String repimgYn; // 대표 이미지 여부
+    private String repImgYn; // 대표 이미지 여부
 
-    // ------------------------------------------------ //
+    // --------------------------------------------------- //
     // DTO -> Entity, Entity -> DTO 전환하는 메서드 구현
-    // ------------------------------------------------ //
+    // --------------------------------------------------- //
 
     // 1. ModelMapper 이용
     private static ModelMapper modelMapper = new ModelMapper();
@@ -39,7 +42,7 @@ public class ItemImgDTO {
         this.imgName = itemImg.getImgName();
         this.oriImgName = itemImg.getOriImgName();
         this.imgUrl = itemImg.getImgUrl();
-        this.repimgYn = itemImg.getRepImgYn();
+        this.repImgYn = itemImg.getRepImgYn();
     }
     // DTO -> Entity 전환:
     public ItemImg toEntity(){
@@ -48,7 +51,7 @@ public class ItemImgDTO {
                 .imgName(imgName)
                 .oriImgName(oriImgName)
                 .imgUrl(imgUrl)
-                .repImgYn(repimgYn)
+                .repImgYn(repImgYn)
                 .build();
     }
 

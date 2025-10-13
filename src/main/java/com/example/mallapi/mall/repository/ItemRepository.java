@@ -1,11 +1,11 @@
 package com.example.mallapi.mall.repository;
 
 import com.example.mallapi.mall.domain.Item;
+import com.example.mallapi.mall.repository.search.ItemSearch;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
-
 
 import java.util.List;
 
@@ -19,7 +19,11 @@ JpaRepository 인터페이스
 
 //public interface ItemRepository extends JpaRepository<Item, Long> {
 public interface ItemRepository extends JpaRepository<Item, Long>,
-                                        QuerydslPredicateExecutor {
+                                                            QuerydslPredicateExecutor<Item>,
+                                                            // 검색관련 인터페이스 상속
+                                                            // ItemSearch : Querydsl로 구현한 => 상품관리 검색 페이징, 메인페이지 상품검색 query
+                                                            ItemSearch { // 인터페이스 상속
+
     // Predicate: '조건에 맞다'고 판단하는 근거를 함수로 제공
     // -> Repository에 Predicate를 파라미터로 전달하기 위해서 QuerydslPredicateExecutor인터페이스를 상속
     // 결론 -> QuerydslPredicateExecutor인터페이스를 상속 받으면 조건처리할 수 있는 함수를 제공
@@ -48,7 +52,25 @@ public interface ItemRepository extends JpaRepository<Item, Long>,
             nativeQuery = true)
     List<Item> findByItemDetailNative(@Param("itemDetail") String itemDetail);
 
-
-
-
 }
+
+
+/*
+    JpaRepository 인터페이스
+        1. <S extends T>save(S entity) : 엔티티 저장 및 수정
+        2. void delete(T entity): 엔티티 삭제
+        3. count(): 엔티티 총 개수 바환
+        4. Iterable<T> findAll() : 모든 엔티티 조회
+ */
+
+/*  Querydsl: 동적 쿼리문
+    - 고정된 SQL문이 아닌 조건에 맞게 동적 쿼리를 생성
+    - 비슷한 쿼리를 재사용, 제약 조건 조립 및 가독성 향상
+    - 문자열이 아닌 자바 소스코드로 작성하기 때문에 컴파일 시점에 오류생성 할 수 있다.
+    - IDE도움을 받아 자동 완성 기능 활용
+
+    QuerydslPredicateExecutor : 상품 조회 구현
+     - Predicate(조건을 판별하는 함수 제공)를 파라미터 전달하기 위해
+       -> QuerydslPredicateExecutor 상속
+
+ */
