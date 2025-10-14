@@ -149,13 +149,13 @@ public class ItemController {
 
         // 4.2 상품 목록 요청 서비스(검색)
         Page<Item> items = itemService.getAdminItemPage(itemSearchDTO, pageable);
-        log.info("---- searchDTO, items");
+        log.info("--> searchDTO, items");
         log.info("search:"+itemSearchDTO);
         log.info("result items: "+items.getContent());
 
         model.addAttribute("items", items);
         model.addAttribute("itemSearchDTO", itemSearchDTO);
-        model.addAttribute("maxPage", 10); // 페이지 블럭단위(1화면 5페이지)
+        model.addAttribute("maxPage", 5); // 페이지 블럭단위(1화면 5페이지)
 
         return "mall/item/itemMng";
 

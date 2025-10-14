@@ -14,7 +14,7 @@
         </div>
 
         <div class="bg-white p-8 md:p-10 rounded-lg border border-gray-200">
-            <!-- 검색 폼 -->
+            <!-- 검색 폼 : model객체에 있는 itemSearchDTO -->
             <form th:action="@{'/admin/items/'+${items.number}}" method="get" th:object="${itemSearchDTO}" class="mb-8">
                 <div class="space-y-5">
                     <!-- 필터 영역 -->
@@ -115,30 +115,120 @@
 </div>
 
 <!-- 현재 페이지에서만 사용하는 CSS정의 -->
-<style layout:fragment="mystyle" th:inline="css">
-    /* Minimal custom styles if needed */
+<style layout:fragment="mystyle"  th:inline="css">
+    .filedError {
+      color: red;
+      font-size: 0.8em;
+
+
+      padding: 0.2em;
+      padding-left:1em; padding-right: 1em;
+    }
+    .mycursor{  cursor: pointer;  }
+
 </style>
 
 <!-- 현재 페이지에서만 사용하는 javasscript 정의 -->
 <script layout:fragment="myscript" th:inline="javascript">
-    function page(pageNumber) {
-        const form = document.createElement('form');
-        form.method = 'get';
-        
-        const searchDateType = document.querySelector('select[name=searchDateType]').value;
-        const searchSellStatus = document.querySelector('select[name=searchSellStatus]').value;
-        const searchBy = document.querySelector('select[name=searchBy]').value;
-        const searchQuery = document.querySelector('input[name=searchQuery]').value;
+    console.log('itemForm javascript!!!')
 
-        form.action = `/admin/items/${pageNumber}?searchDateType=${searchDateType}&searchSellStatus=${searchSellStatus}&searchBy=${searchBy}&searchQuery=${searchQuery}`;
-        document.body.appendChild(form);
-        form.submit();
+/*
+    // ----------------------------------------------------------- //
+    // 1. javascript:  조건별 검색 success
+    // ----------------------------------------------------------- //
+
+    // 1.1 page()함수 : 페이징 처리 ( 검색)
+
+    function page(page){
+
+      var current_seq_page = page;
+      var current_page = [[${items.number}]]
+      //alert('page:'+current_seq_page+", "+current_page)
+      //console.log('page:',current_seq_page, current_page)
+
+      // 현재 페이지번호와 선택된 페이지 번호가 동일하면 링크 해제
+      if (current_seq_page == current_page) {
+          return
+      }
+
+      // 검색버튼에서 page요청시  선택페이지와 현재페이번호 비교판단 없이 검색 활성화 설정
+       if (page == -100) page = 0;
+
+      // 조건 검색시 선택된 필터 조건 값
+      let searchDateType    = document.querySelector('#searchDateType').value;
+      let searchSellStatus  = document.querySelector('#searchSellStatus').value;
+      let searchBy          = document.querySelector('#searchBy').value;
+      let searchQuery       = document.querySelector('#searchQuery').value;
+
+      console.log(searchDateType)
+      console.log(searchSellStatus)
+      console.log(searchBy)
+      console.log(searchQuery)
+
+      // 서버요청시  : 조건 검색 전달
+      location.href = "/admin/items/"+page+"?" +
+                      "&searchDateType=" + searchDateType +
+                      "&searchSellStatus="+ searchSellStatus +
+                      "&searchBy=" + searchBy +
+                      "&searchQuery=" + searchQuery;
+
+
     }
 
-    document.querySelector('.searchBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        page(0);
+
+    // searchBtn(검색버튼) 클릭시 처리
+
+    document.querySelector('.searchBtn').addEventListener('click', function(e){
+      e.preventDefault() // 내장된 이벤트 삭제
+      //e.stopPropagation()
+
+      page(-100) // 0 인덱스 페이지 로 설정됨(0: 첫페이지)
     });
+
+*/
+
+
+    // ----------------------------------------------------------- //
+    // 3. jQuery 활용 : 조건별 검색 success
+    // ----------------------------------------------------------- //
+
+    $(function(){
+      console.log('jQuery Loaded ... success!!!');
+
+      // searchBtn 클릭
+      $('.searchBtn').on('click', function(e){
+        e.preventDefault();
+
+
+
+        pageJQuery(0)
+      });
+
+    });
+
+    function pageJQuery(page){
+        // 조건 검색시 선택된 필터 조건 값
+      let searchDateType    = $('#searchDateType').val();
+      let searchSellStatus  = $('#searchSellStatus').val();
+      let searchBy          = $('#searchBy').val();
+      let searchQuery       = $('#searchQuery').val();
+
+      console.log(searchDateType)
+      console.log(searchSellStatus)
+      console.log(searchBy)
+      console.log(searchQuery)
+
+      // 서버요청시  : 조건 검색 전달
+      location.href = "/admin/items/"+page+"?" +
+                      "&searchDateType=" + searchDateType +
+                      "&searchSellStatus="+ searchSellStatus +
+                      "&searchBy=" + searchBy +
+                      "&searchQuery=" + searchQuery;
+
+
+    }
+
+
 </script>
 
 </html>
