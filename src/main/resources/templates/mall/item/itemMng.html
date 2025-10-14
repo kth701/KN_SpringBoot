@@ -96,7 +96,7 @@
                     </a>
 
                     <div th:each="page: ${#numbers.sequence(start, end)}">
-                        <a th:onclick="'page(' + ${page-1} + ')'" 
+                        <a th:onclick="'page(' + ${page-1} + ')'"
                            th:text="${page}" 
                            th:class="${items.number == page-1} ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-100'" 
                            class="min-w-[36px] h-9 flex items-center justify-center rounded-md text-sm font-medium cursor-pointer">
@@ -201,12 +201,29 @@
 
 
 
-        pageJQuery(0)
+        page(0)
       });
 
     });
 
-    function pageJQuery(page){
+    function page(page){
+    /*
+      var current_seq_page = page;
+      var current_page = [[${items.number}]]
+
+      //alert('page:'+current_seq_page+", "+current_page)
+      //console.log('page:',current_seq_page, current_page)
+
+      // 현재 페이지번호와 선택된 페이지 번호가 동일하면 링크 해제
+      if (current_seq_page == current_page) {
+          return
+      }
+
+      // 검색버튼에서 page요청시  선택페이지와 현재페이번호 비교판단 없이 검색 활성화 설정
+       if (page == -100) page = 0;
+   */
+
+
         // 조건 검색시 선택된 필터 조건 값
       let searchDateType    = $('#searchDateType').val();
       let searchSellStatus  = $('#searchSellStatus').val();
