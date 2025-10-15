@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/.thymeleaf/layout" >
+
+<head>
+    <meta charset="UTF-8">
+    <title>Shop - Modern Shop</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 1. 스타일 적용-->
+    <style th:inline="css">
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .main-image-animation {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+    </style>
+    <th:block layout:fragment="mystyle"></th:block><!-- 페이지별 사용되는 CSS-->
+
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <div th:replace="~{fragments/header::navbar}"></div>
+
+    <!-- Hero Section -->
+    <main class="container mx-auto px-6 py-16 text-center">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+            <div class="md:w-1/2 mb-10 md:mb-0">
+                <h1 class="text-5xl font-extrabold text-gray-900 mb-4">New Season Arrivals!!!</h1>
+                <p class="text-lg text-gray-600 mb-8">Check out all the new trends</p>
+                <a href="#" class="bg-gray-900 text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 transition duration-300">Shop Now</a>
+            </div>
+            <div class="md:w-1/2">
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1999&auto=format&fit=crop"
+                     alt="Main Product Image" class="rounded-lg shadow-2xl main-image-animation">
+            </div>
+        </div>
+    </main>
+
+    <!-- Featured Products -->
+    <section class="bg-white py-20 featured-products">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Featured Products</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Product 1 -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop" alt="Product 1" class="w-full h-56 object-cover">
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg mb-2">Headphones</h3>
+                        <p class="text-gray-600 text-sm mb-4">High-quality sound</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xl">$99.99</span>
+                            <a href="#" class="bg-gray-900 text-white px-4 py-2 rounded-full hover:bg-gray-800 text-sm">Add to Cart</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 2, 3, 4... -->
+            </div>
+        </div>
+    </section>
+
+    <!-- New Products -->
+    <section class="bg-gray-50 py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">New Arrivals</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div th:each="item : ${items.getContent()}" class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <a th:href="@{'/item/' + ${item.id}}">
+                        <img th:src="${item.imgUrl}" alt="Product Image" class="w-full h-56 object-cover">
+                    </a>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg mb-2" th:text="${item.itemNm}">Product Name</h3>
+                        <p class="text-gray-600 text-sm mb-4" th:text="${#strings.abbreviate(item.itemDetail, 50)}">Product detail snippet...</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xl" th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')} + '원'">Price</span>
+                            <a th:href="@{'/item/' + ${item.id}}" class="bg-gray-900 text-white px-4 py-2 rounded-full hover:bg-gray-800 text-sm">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Pagination -->
+            <div class="mt-12" th:if="${!items.isEmpty()}">
+                <nav class="flex items-center justify-center gap-x-2" th:with="start=${(items.number/maxPage)*maxPage+1}, end=${items.totalPages==0 ? 1 : (start+(maxPage-1) < items.totalPages ? start+(maxPage-1): items.totalPages)}">
+                    <a th:href="${items.first} ? '#' : '/?searchQuery=' + ${itemSearchDTO.searchQuery} + '&page=' + ${items.number-1}" 
+                       th:class="${items.first} ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'" 
+                       class="min-w-[36px] h-9 flex items-center justify-center rounded-md px-2 text-sm font-medium">Previous</a>
+                    <div th:each="page: ${#numbers.sequence(start, end)}">
+                        <a th:href="'/?searchQuery=' + ${itemSearchDTO.searchQuery} + '&page=' + ${page-1}" 
+                           th:text="${page}" 
+                           th:class="${items.number == page-1} ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-100'" 
+                           class="min-w-[36px] h-9 flex items-center justify-center rounded-md text-sm font-medium cursor-pointer"></a>
+                    </div>
+                    <a th:href="${items.last} ? '#' : '/?searchQuery=' + ${itemSearchDTO.searchQuery} + '&page=' + ${items.number+1}" 
+                       th:class="${items.last} ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'" 
+                       class="min-w-[36px] h-9 flex items-center justify-center rounded-md px-2 text-sm font-medium">Next</a>
+                </nav>
+            </div>
+        </div>
+    </section>
+
+    <!-- 베스트 상품 -->
+    <section class="bg-white py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">베스트 상품</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Placeholder Product -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?q=80&w=1964&auto=format&fit=crop" alt="Best Product" class="w-full h-56 object-cover">
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg mb-2">Best Item 1</h3>
+                        <p class="text-gray-600 text-sm mb-4">Description for best item.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xl">$199.99</span>
+                            <a href="#" class="bg-gray-900 text-white px-4 py-2 rounded-full hover:bg-gray-800 text-sm">Add to Cart</a>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Add 3 more placeholders -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 할인 상품 -->
+    <section class="bg-gray-50 py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">할인 상품</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Placeholder Product -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?q=80&w=1974&auto=format&fit=crop" alt="Sale Product" class="w-full h-56 object-cover">
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg mb-2">Sale Item 1</h3>
+                        <p class="text-gray-600 text-sm mb-4">Special discount item.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xl text-red-600">$79.99</span>
+                            <a href="#" class="bg-gray-900 text-white px-4 py-2 rounded-full hover:bg-gray-800 text-sm">Add to Cart</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Add 3 more placeholders -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer::bottom_footer}"></div>
+
+    <!-- 2. javascript-->
+    <script>
+        $(document).ready(function() {
+            // Example of a simple jQuery interaction
+            $('.bg-gray-900').on('mouseenter', function() {
+                // You can add interactive effects here
+            });
+        });
+    </script>
+</body>
+</html>

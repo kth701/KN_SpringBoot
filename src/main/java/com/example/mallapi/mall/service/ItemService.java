@@ -145,14 +145,19 @@ public class ItemService {
 
     //--------------------------------------------------------------------------------- //
     // 4. 상품 검색
+    // @Transactional(readOnly = true): 트랜잭션 읽기 전용: JPA가 더티채킹(변경감지)를
+    //      수행하지 않도록 설정(성능향상)
     //--------------------------------------------------------------------------------- //
     @Transactional(readOnly = true)
     public Page<Item> getAdminItemPage(ItemSearchDTO itemSearchDTO, Pageable pageable){
 
         return itemRepository.getAdminItemPage(itemSearchDTO, pageable);
     }
+
     // 5. 메인 화면 상품 리스트
+    @Transactional(readOnly = true)
     public Page<MainItemDTO> getMainItemPage(ItemSearchDTO itemSearchDTO, Pageable pageable){
+        // 조회 결과값은 Page객체로 반환됨
         return itemRepository.getMainItemPage(itemSearchDTO, pageable);
     }
 

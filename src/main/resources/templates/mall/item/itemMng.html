@@ -86,15 +86,21 @@
                 </table>
             </div>
 
-            <!-- 페이징 처리 -->
+            <!-- 페이징 처리
+            시작페이지(start)  = (현재페이지번호/보여줄 페이지 수) + 1 => (0,..,9)/10*10 +1 => 1, 0페이지~9페이지 => 1
+            끝페이지(end) = start +(보여줄페이지-1) => 1 + (10-1) => 10
+            끝페이지 번호가 전체페이지 보다 크면 전체페이지를 end에 설정
+            -->
             <div th:if="${!items.isEmpty()}" th:with="start=${(items.number/maxPage)*maxPage+1}, end=${items.totalPages==0 ? 1 : (start+(maxPage-1) < items.totalPages ? start+(maxPage-1): items.totalPages)}" class="mt-8">
                 <nav class="flex items-center justify-center gap-x-2">
+                    <!-- 첫번째 페이지이면 <이전링크버튼> 비활성화, 그렇지않으면 현재페이지번호 -1 로 처리 -->
                     <a th:onclick="${items.first} ? 'return false;' : 'page(' + ${items.number-1} + ')'" 
                        th:class="${items.first} ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'" 
                        class="min-w-[36px] h-9 flex items-center justify-center rounded-md px-2 text-sm font-medium">
                         Previous
                     </a>
 
+                    <!-- 현재 페이지 번호에 해당되는 페이지블럭 페이지 범위 숫자 출력, 현재 페이지 번호와 숫자가 일치화면 페이지 링크 기능 비활성화  -->
                     <div th:each="page: ${#numbers.sequence(start, end)}">
                         <a th:onclick="'page(' + ${page-1} + ')'"
                            th:text="${page}" 
@@ -103,6 +109,7 @@
                         </a>
                     </div>
 
+                    <!-- 마지막 페이지이면 <다음링크버튼>비활성화, 그렇지않으면 현재페이지번호 -1 로 처리 -->
                     <a th:onclick="${items.last} ? 'return false;' : 'page(' + ${items.number+1} + ')'" 
                        th:class="${items.last} ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'" 
                        class="min-w-[36px] h-9 flex items-center justify-center rounded-md px-2 text-sm font-medium">

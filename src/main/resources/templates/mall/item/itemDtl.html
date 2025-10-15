@@ -1,0 +1,361 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/.thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+
+
+<!-- csrf설정을 비활성화되었으면 아래부분 주석 처리 할 것 -->
+<!-- 테스트 중 : SpringEL expression: "_csrf.token"  에러
+<head>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+-->
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content" class="p-3">
+
+    <div class="container  p-2">
+        <h1> 상품 상세 페이지</h1>
+        <hr>
+        <div>
+            <div class="card" >
+                <div class="card-body">
+                    <!-- 정보 전달 용도 사용(장바구니, 주문하기) :  상품 id -->
+                    <input type="hidden" th:value="${item.id}"  id="itemId" />
+                    <div>
+                        <div class="row mx-4 p-4 border">
+                            <!-- 상품 대표 이미지 : 좌측 배치 -->
+                            <div class="col-lg-7  p-3 ">
+                                <div>
+                                    <img th:src="${item.itemImgDTOList[0].imgUrl}" class="img-fluid" />
+                                </div>
+                            </div>
+                            <!-- 상품 판매 관련 정보 : 우측 배치 -->
+                            <div class="col-lg-5 p-3 border">
+
+                                <!-- 판매중, 품절 -->
+                                <div>
+                  <span   th:if="${item.itemSellStatus == T(com.example.mallapi.constant.ItemSellStatus).SELL}"
+                          class="fs-6 text-success">판매중</span>
+                                    <span   th:unless="${item.itemSellStatus == T(com.example.mallapi.constant.ItemSellStatus).SELL}"
+                                            class="fs-6 text-danger">품절</span>
+                                </div>
+                                <hr >
+
+                                <!-- 상품 이름 -->
+                                <div th:text="${item.itemNm}" class="fs-5 mt-1"></div>
+
+                                <!-- 가격, 수량 -->
+                                <div class="mt-3">
+                                    <div class="mb-1">
+                                        <input type="hidden" th:value="${item.price}" id="price" name="price" />
+                                        <span th:text="${ #numbers.formatInteger(item.price, 3, 'COMMA')}" class="text-danger" />원
+                                    </div>
+                                    <div class="input-group mb-3 mt-2 w-50">
+                                        <span class="input-group-text">수량</span>
+                                        <input type="number" name="count" id="count"
+                                               class="form-control" placeholder="수량" value="1" min="1" max="100"/>
+                                    </div>
+                                    <hr class="my-5">
+                                </div>
+
+                                <!-- 결재 금액 -->
+                                <div class="d-flex justify-content-end mx-4">
+                                    <div>
+                                        <div name="totPrice"   class="fs-4 font-weight-bold ">
+                                            <span>총금액: <span class="text-danger" id="totPrice">0원</span></span>
+                                        </div>
+                                        <!-- 판매중 일 경우 -->
+                                        <div th:if="${item.itemSellStatus == T(com.example.mallapi.constant.ItemSellStatus).SELL}"
+                                             class="d-grid gap-2 d-md-block mt-3">
+                                            <button class="btn btn-outline-success"      type="button" onClick="addCartJS()">장바구니담기</button>
+                                            <button class="btn btn-outline-primary my-1" type="button" onClick="orderJS()">주문하기</button>
+                                        </div>
+                                        <!-- 품절 일 경우 -->
+                                        <div th:unless="${item.itemSellStatus == T(com.example.mallapi.constant.ItemSellStatus).SELL}"
+                                             class="d-grid gap-2 d-md-block mt-3">
+                                            <button class="btn btn-outline-primary my-1" type="button" onClick="orderJS()">주문하기</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 상품 상세 설명 -->
+                        <div class="mt-4 p-3">
+
+                            <h2 class="mx-1">상세 설명</h2>
+                            <hr>
+                            <div class="m-2 p-2">
+                                <p class="card-text fs-6">
+                                    [[${item.itemDetail}]]
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- 상품 이미지 나열 하기 -->
+                    <div class="mt-4 p-3">
+                        <h3 class="text-secondary-emphasis">상품 상세 이미지</h3>
+                        <hr>
+                        <div th:each="itemImg : ${item.itemImgDTOList}"
+                             class="my-3 p-3">
+
+                            <!-- 상품 이미지가 있는 경우에만 표시 -->
+                            <img th:if="${ not #strings.isEmpty(itemImg.imgUrl)}"
+                                 th:src="${itemImg.imgUrl}" class="img-fluid rounded ">
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <hr>
+            [[${item}]]
+        </div>
+
+    </div>
+
+
+    <!-- Axios :비동기 처리하는 라이브러리 (javascript:Promise)-->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!--  정적리소스:static폴더 기준 -->
+    <script th:src="@{/axiosJS/axiosOrder.js}"></script>
+</div>
+
+
+<!-- 현재 페이지에서만 사용하는 CSS정의 -->
+<style layout:fragment="mystyle"  th:inline="css">
+
+
+</style>
+
+<!-- 현재 페이지에서만 사용하는 javasscript 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+
+    // ----------------------------------------------------------- //
+    // 1. javascript
+    // ----------------------------------------------------------- //
+    const itemPrice = document.querySelector('#price').value
+    const itemId = document.querySelector('#itemId').value
+
+    var itemCount = document.querySelector('#count')
+    var countValue = itemCount.value
+
+
+    // ----------------------------------------------------------- //
+    // 초기값을 기준으로 총금액계산
+    // 총금액 게산 처리하는 함수 호출
+    // ----------------------------------------------------------- //
+      calculateTotalPriceJS();
+    // ----------------------------------------------------------- //
+
+    // 수량객체가 변동 되면 처리하는 메서드
+    itemCount.addEventListener('change', ()=>{
+      countValue = itemCount.value
+
+      //console.log('change')
+      //console.log(itemPrice, countValue)
+
+      // 총금액 게산 처리하는 함수 호출
+      calculateTotalPriceJS();
+    })
+
+
+    // ----------------------------------------------------------- //
+    // 총금액 = 수량 * 금액
+    // ----------------------------------------------------------- //
+    function calculateTotalPriceJS(){
+      let totalPrice = itemPrice * countValue
+
+      // 정규식 표현 적용
+      // 숫자 -> 문자열 전화 -> 3자리마다 콤마 형식 -> 숫자 형식 작성
+      let fmt_totalPrice = totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      document.querySelector('#totPrice').innerHTML = fmt_totalPrice+"원"
+
+      //console.log(fmt_totalPrice)
+    }
+
+    // -------------------------------------------------------  //
+    // Axios : 주문처리하는 함수 선언
+    // -------------------------------------------------------  //
+    /*
+    async function orderItemFn(orderItemData){
+        // 요청과정
+        const response = await axios.post('/order', orderItemData)
+        console.log('서버로 부터 응답:',response)
+        console.log('서버 응답 메시지:', response.data)
+
+        return response;
+    }
+    */
+
+
+    // -------------------------------------------------------  //
+    // Axios 주문 처리
+    // -------------------------------------------------------  //
+    function orderJS(){
+      //console.log('주문 호출')
+
+      const orderItemData = {
+        itemId: document.querySelector('#itemId').value,
+        count: document.querySelector('#count').value
+      }// end JSON
+
+      // axios 함수 호출(서버에 비동기 주문호출)
+      orderItemFn(orderItemData)
+            // 서버가 정상 응답 할 경우
+            .then( (result) => {
+                console.log('result=>', result)
+                console.log('result.data=>', result.data)
+
+                alert('주문 완료 되었습니다.')
+                location.href ='/'
+            })
+            // 실패할 경우
+            .catch( (e) => {
+                console.log(e)
+
+                if (e.response.status == "500") {
+                  alert("로그인 후 이용해 주세요")
+                  location.href='/members/login'
+                } else {
+                  alert('error code: '+e.response.status+'\n'+e.response.data)
+                }
+
+
+            })
+
+
+
+    }
+
+    // -------------------------------------------------------  //
+    // Axios 적용: 장바구니 담기
+    // -------------------------------------------------------  //
+    function addCartJS(){
+      //console.log('장바구니 호출..')
+
+      const cartItemData = {
+        itemId : itemId  ,
+        count: countValue
+      }
+
+      // 장바구니 담기처리 하는 함수 호출(비동기 처리)
+      cartItem(cartItemData)
+          .then( (result) => {
+            alert("상품을 장바구니에 담았습니다.")
+            location.href="/"
+          })
+          .catch( (e) => {
+            if (e.response.status == "500") {
+              alert("로그인 후 이용해 주세요")
+              location.href='/members/login'
+            } else {
+              alert('error code: '+e.response.status+'\n'+e.response.data)
+            }
+          });
+
+
+
+    }
+
+
+
+
+      // ----------------------------------------------------------- //
+      // 2. jQuery
+      // ----------------------------------------------------------- //
+      $(function(){
+        console.log('jQuery ...')
+
+        // 수량 변동시 처리
+        /*
+        $('#count').change(function(){
+          calculateTotalPriceJQuery()
+        })
+      */
+
+      })
+      function calculateTotalPriceJQuery(){
+        let count = $('#count').val()
+        let price = $('#price').val()
+        let totPrice = price * count
+
+        let fmt_totalPrice = totPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        $('#totPrice').html(fmt_totalPrice+"원")
+
+      }
+    // -------------------------------------------------------  //
+    // 1. Ajax() 장바구니
+    // -------------------------------------------------------  //
+    function addCartJS2(){
+      //console.log('jQuery 장바구니 호출..')
+    }
+
+    // -------------------------------------------------------  //
+    // 2. Ajax() 주문하기
+    // -------------------------------------------------------  //
+    function orderJS2(){
+      //console.log('jQuery 주문 호출')
+      // head에서 선언후
+      // var token   = $("meta[name='_csrf']").attr("content")
+      // var header  = $("meta[name='_csrf_header']").attr("content")
+
+      // 2.1 요청할 URL
+      const url ="/order"
+
+      // 2.2 전송할 Data 객체 <-> Java에 OrderDTO 와 1:1 자동 맵핑
+      const paramData = {
+        itemId  : $('#itemId').val(),
+        count   : $('#count').val()
+      }
+
+      // 2.3 JSON -> String 전환
+      const param = JSON.stringify(paramData)
+
+      // 2.4 서버에 요청 작업
+      $.ajax({
+        url: url,
+        type: 'POST',
+        contentType : "application/json",
+        data : param,
+
+        // beforeSend: function(xhr){
+        //     /* 데이터를 전송하기 전에 헤더에 csrf값을 설정 */
+        //     xhr.setRequestHeader(header, token)
+        // },
+
+        dataType: "json",
+        cache : false,
+        success : function(result, status){
+          console.log("서버로 응답:", result, status)
+
+          alert('주문 완료 되었습니다.')
+          location.href ='/'
+        },
+        error: function(jqXHR, status, error){
+          console.log("서버로 응답:", jqXHR, status, error)
+
+          // Unauthorized: 지정한 리소스에 대한 액세스 권한 없음
+          if (jqXHR.status == '401')  {
+            alert('로그인 후 이용해 주세요')
+            location.href = '/members/login'
+          } else {
+            alert(jqXHR.responseText)
+          } // end if
+        } // end error
+
+      });
+
+    }
+
+</script>
+
+
+</html>
+
+
