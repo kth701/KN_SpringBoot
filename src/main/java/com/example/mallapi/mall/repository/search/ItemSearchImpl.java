@@ -45,7 +45,7 @@ public class ItemSearchImpl implements ItemSearch {
         } else if (StringUtils.equals("1w", searchDateType)) {
             dateTime = dateTime.minusWeeks(1);
         } else if (StringUtils.equals("1m", searchDateType)) {
-            dateTime = dateTime.minusMonths(1); // BUG FIX: minusMinutes -> minusMonths
+            dateTime = dateTime.minusMonths(1);
         } else if (StringUtils.equals("6m", searchDateType)) {
             dateTime = dateTime.minusMonths(6);
         }
@@ -54,6 +54,10 @@ public class ItemSearchImpl implements ItemSearch {
     }
 
     private BooleanExpression searchByLike(String searchBy, String searchQuery) {
+        if (StringUtils.isEmpty(searchQuery)) {
+            return null;
+        }
+
         if (StringUtils.equals("itemNm", searchBy)) {
             return QItem.item.itemNm.like("%" + searchQuery + "%");
         } else if (StringUtils.equals("createdBy", searchBy)) {
@@ -78,8 +82,6 @@ public class ItemSearchImpl implements ItemSearch {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        log.info("contents: {}", itemList);
-
         Long total = queryFactory
                 .select(Wildcard.count)
                 .from(QItem.item)
@@ -90,8 +92,6 @@ public class ItemSearchImpl implements ItemSearch {
                 )
                 .fetchOne();
 
-        log.info("total: {}", total);
-
         return new PageImpl<>(itemList, pageable, total == null ? 0 : total);
     }
 
@@ -101,30 +101,28 @@ public class ItemSearchImpl implements ItemSearch {
 
     @Override
     public Page<MainItemDTO> getMainItemPage(ItemSearchDTO itemSearchDTO, Pageable pageable) {
-        QItem item = QItem.item;
-        QItemImg itemImg = QItemImg.itemImg;
 
         List<MainItemDTO> content = queryFactory
                 .select(
-                        new QMainItemDTO(item.id, item.itemNm, item.itemDetail, itemImg.imgUrl, item.price)
+                        new QMainItemDTO(QItem.item.id, QItem.item.itemNm, QItem.item.itemDetail, QItemImg.itemImg.imgUrl, QItem.item.price)
                 )
-                .from(itemImg)
-                .join(itemImg.item, item)
+                .from(QItemImg.itemImg)
+                .join(QItemImg.itemImg.item, QItem.item)
                 .where(
-                        itemImg.repImgYn.eq("Y"), // Combine where clauses
+                        QItemImg.itemImg.repImgYn.eq("Y"),
                         itemNmLike(itemSearchDTO.getSearchQuery())
                 )
-                .orderBy(item.id.desc())
+                .orderBy(QItem.item.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         Long total = queryFactory
                 .select(Wildcard.count)
-                .from(itemImg)
-                .join(itemImg.item, item)
+                .from(QItemImg.itemImg)
+                .join(QItemImg.itemImg.item, QItem.item)
                 .where(
-                        itemImg.repImgYn.eq("Y"), // Combine where clauses
+                        QItemImg.itemImg.repImgYn.eq("Y"),
                         itemNmLike(itemSearchDTO.getSearchQuery())
                 )
                 .fetchOne();

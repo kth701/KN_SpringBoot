@@ -9,70 +9,75 @@
         <div class="lg:grid lg:grid-cols-2 lg:gap-x-12 lg:items-start">
             <!-- 이미지 영역 -->
             <div class="space-y-4">
-                <!-- 대표 이미지 -->
-                <div>
+                <!-- 대표 이미지: 리스트가 비어있지 않고, 첫 번째 이미지의 URL이 있는 경우에만 표시 -->
+                <div th:if="${not #lists.isEmpty(item.itemImgDTOList) and not #strings.isEmpty(item.itemImgDTOList[0].imgUrl)}">
                     <img id="mainImage" th:src="${item.itemImgDTOList[0].imgUrl}" alt="대표 상품 이미지" class="w-full h-auto object-cover rounded-lg shadow-md">
                 </div>
-                <!-- 썸네일 이미지 -->
+                <!-- 썸네일 이미지: URL이 있는 이미지만 반복해서 표시 -->
                 <div class="grid grid-cols-5 gap-2">
-                    <div th:each="itemImg : ${item.itemImgDTOList}">
+                    <div th:each="itemImg : ${item.itemImgDTOList}" th:if="${not #strings.isEmpty(itemImg.imgUrl)}">
                         <img th:src="${itemImg.imgUrl}" alt="상품 썸네일" class="thumbnail-img w-full h-auto object-cover rounded-md cursor-pointer border-2 border-transparent hover:border-gray-500 transition">
                     </div>
                 </div>
             </div>
 
-            <!-- 상품 정보 및 액션 영역 -->
-            <div class="mt-10 lg:mt-0">
+            <!-- 상품 정보 및 구매 옵션 -->
+            <div class="mt-10 lg:mt-0 space-y-6">
                 <input type="hidden" th:value="${item.id}" id="itemId" />
                 <input type="hidden" th:value="${item.price}" id="price" />
 
-                <!-- 상품명 -->
-                <h1 class="text-3xl font-bold tracking-tight text-gray-900" th:text="${item.itemNm}"></h1>
-
-                <!-- 가격 -->
-                <div class="mt-3">
-                    <p class="text-3xl tracking-tight text-gray-900" th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')} + '원'"></p>
+                <div>
+                    <h1 class="text-2xl font-semibold text-black" th:text="${item.itemNm}"></h1>
+                    <p class="text-lg text-gray-800 mt-2" th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')} + '원'"></p>
+                    <p class="text-sm text-gray-500 mt-4" th:text="${item.itemDetail}"></p>
                 </div>
 
-                <!-- 상품 상태 -->
-                <div class="mt-4">
-                    <span th:if="${item.itemSellStatus == T(com.example.mallapi.constant.ItemSellStatus).SELL}" class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">판매중</span>
-                    <span th:unless="${item.itemSellStatus == T(com.example.mallapi.constant.ItemSellStatus).SELL}" class="inline-block bg-red-100 text-red-800 text-xs font-medium px-2.5 py-1 rounded-full">품절</span>
-                </div>
-
-                <!-- 상품 상세 설명 (간략) -->
-                <div class="mt-6 space-y-6 text-base text-gray-700">
-                    <p th:text="${item.itemDetail}"></p>
-                </div>
-
-                <div class="mt-6">
-                    <!-- 수량 -->
+                <div class="border-t border-b border-gray-200 py-6 space-y-4">
+                    <!-- 수량 선택 -->
                     <div class="flex items-center">
-                        <label for="count" class="mr-4 text-sm font-medium text-gray-900">수량</label>
-                        <input type="number" name="count" id="count" value="1" min="1" max="100" class="w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <label for="quantity" class="w-20 text-sm font-medium">수량</label>
+                        <div class="flex items-center border border-gray-300 rounded-md">
+                            <button id="quantity-minus" class="px-3 py-1 text-lg">-</button>
+                            <input type="text" id="quantity" value="1" class="w-12 text-center border-l border-r text-sm py-2 focus:outline-none">
+                            <button id="quantity-plus" class="px-3 py-1 text-lg">+</button>
+                        </div>
                     </div>
+                </div>
 
-                    <!-- 총 금액 -->
-                    <div class="mt-8 flex justify-between items-center">
-                        <span class="text-xl font-bold text-gray-900">총 상품 금액</span>
-                        <span id="totalPrice" class="text-2xl font-bold text-indigo-600"></span>
-                    </div>
-
-                    <!-- 액션 버튼 -->
-                    <div class="mt-8 grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
-                        <button th:disabled="${item.itemSellStatus != T(com.example.mallapi.constant.ItemSellStatus).SELL}" type="button" onclick="addCartJS()" class="w-full bg-gray-800 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-gray-700 disabled:bg-gray-300">장바구니 담기</button>
-                        <button th:disabled="${item.itemSellStatus != T(com.example.mallapi.constant.ItemSellStatus).SELL}" type="button" onclick="orderJS()" class="w-full bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 disabled:bg-gray-300">바로 구매</button>
-                    </div>
+                <!-- 총 금액 및 구매 버튼 -->
+                <div class="flex justify-between items-center">
+                    <p id="totalPrice" class="text-xl font-semibold text-black">총 금액: 0원</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <button th:disabled="${item.itemSellStatus != T(com.example.mallapi.constant.ItemSellStatus).SELL}" type="button" onclick="addCartJS()" class="w-full bg-gray-800 text-white py-3 rounded-md hover:bg-black transition-colors disabled:bg-gray-300">ADD TO CART</button>
+                    <button th:disabled="${item.itemSellStatus != T(com.example.mallapi.constant.ItemSellStatus).SELL}" type="button" onclick="orderJS()" class="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition-colors disabled:bg-gray-300">BUY NOW</button>
                 </div>
             </div>
         </div>
 
-        <!-- 상품 상세 이미지 (하단) -->
-        <div class="mt-16 pt-10 border-t border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">상품 상세 정보</h2>
-            <div class="space-y-6">
-                <div th:each="itemImg : ${item.itemImgDTOList}" class="flex justify-center">
-                    <img th:if="${not #strings.isEmpty(itemImg.imgUrl)}" th:src="${itemImg.imgUrl}" class="max-w-full h-auto rounded-lg">
+        <!-- 상품 상세 정보 탭 -->
+        <div class="mt-24">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8" id="detail-tabs">
+                    <button class="detail-tab-link detail-active-tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" data-tab="detail-tab1">상품 상세 정보</button>
+                    <button class="detail-tab-link text-gray-500 whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm" data-tab="detail-tab2">리뷰</button>
+                    <button class="detail-tab-link text-gray-500 whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm" data-tab="detail-tab3">Q&A</button>
+                </nav>
+            </div>
+            <div class="py-12">
+                <!-- 상품 정보 콘텐츠 -->
+                <div id="detail-tab1" class="detail-tab-content active space-y-6">
+                    <div th:each="itemImg : ${item.itemImgDTOList}" class="flex justify-center">
+                        <img th:if="${not #strings.isEmpty(itemImg.imgUrl)}" th:src="${itemImg.imgUrl}" class="max-w-full h-auto rounded-lg">
+                    </div>
+                </div>
+                <!-- 리뷰 콘텐츠 -->
+                <div id="detail-tab2" class="detail-tab-content">
+                    <p>리뷰 게시판 영역입니다.</p>
+                </div>
+                <!-- Q&A 콘텐츠 -->
+                <div id="detail-tab3" class="detail-tab-content">
+                    <p>Q&A 게시판 영역입니다.</p>
                 </div>
             </div>
         </div>
@@ -86,8 +91,18 @@
 <!-- 현재 페이지에서만 사용하는 CSS정의 -->
 <style layout:fragment="mystyle" th:inline="css">
     .thumbnail-img.active {
-        border-color: #4f46e5; /* indigo-600 */
-        box-shadow: 0 0 0 2px #a5b4fc; /* indigo-300 */
+        border-color: #000;
+    }
+    .detail-tab-content {
+        display: none;
+    }
+    .detail-tab-content.active {
+        display: block;
+    }
+    .detail-active-tab {
+        border-bottom: 2px solid black;
+        color: black;
+        font-weight: 500;
     }
 </style>
 
@@ -95,76 +110,89 @@
 <script layout:fragment="myscript" th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function () {
         const price = parseFloat(document.getElementById('price').value);
-        const countInput = document.getElementById('count');
+        const quantityInput = document.getElementById('quantity');
         const totalPriceEl = document.getElementById('totalPrice');
 
         function calculateTotalPrice() {
-            const count = parseInt(countInput.value);
-            const total = price * count;
-            totalPriceEl.textContent = total.toLocaleString('ko-KR') + '원';
+            const quantity = parseInt(quantityInput.value);
+            const total = price * quantity;
+            if(totalPriceEl) {
+                totalPriceEl.textContent = '총 금액: ' + total.toLocaleString('ko-KR') + '원';
+            }
         }
 
-        countInput.addEventListener('change', calculateTotalPrice);
-        calculateTotalPrice(); // 초기 로드 시 총액 계산
+        // 수량 조절 버튼
+        document.getElementById('quantity-plus').addEventListener('click', function() {
+            let currentQuantity = parseInt(quantityInput.value);
+            quantityInput.value = currentQuantity + 1;
+            calculateTotalPrice();
+        });
 
-        // 이미지 갤러리 기능
+        document.getElementById('quantity-minus').addEventListener('click', function() {
+            let currentQuantity = parseInt(quantityInput.value);
+            if (currentQuantity > 1) {
+                quantityInput.value = currentQuantity - 1;
+                calculateTotalPrice();
+            }
+        });
+
+        quantityInput.addEventListener('change', calculateTotalPrice);
+        calculateTotalPrice();
+
+        // 이미지 갤러리
         const mainImage = document.getElementById('mainImage');
         const thumbnails = document.querySelectorAll('.thumbnail-img');
-
         thumbnails.forEach(thumbnail => {
             thumbnail.addEventListener('click', function () {
-                mainImage.src = this.src;
-                // 활성 썸네일 스타일 업데이트
+                if(mainImage) { mainImage.src = this.src; }
                 thumbnails.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
             });
         });
-        // 첫 번째 썸네일에 active 클래스 추가
-        if(thumbnails.length > 0) {
-            thumbnails[0].classList.add('active');
-        }
+        if(thumbnails.length > 0) { thumbnails[0].classList.add('active'); }
+
+        // 상세 정보 탭
+        const tabLinks = document.querySelectorAll('.detail-tab-link');
+        const tabContents = document.querySelectorAll('.detail-tab-content');
+        tabLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+                
+                tabLinks.forEach(l => {
+                    l.classList.remove('detail-active-tab');
+                    l.classList.add('text-gray-500');
+                });
+                this.classList.add('detail-active-tab');
+                this.classList.remove('text-gray-500');
+
+                tabContents.forEach(content => {
+                    if (content.id === tabId) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+            });
+        });
     });
 
-    // 장바구니 담기
     function addCartJS() {
-        const cartItemData = {
-            itemId: document.getElementById('itemId').value,
-            count: document.getElementById('count').value
-        };
+        const cartItemData = { itemId: document.getElementById('itemId').value, count: document.getElementById('quantity').value };
         cartItem(cartItemData)
-            .then(result => {
-                alert("상품을 장바구니에 담았습니다.");
-                // 필요 시 장바구니 페이지로 이동
-                // location.href = '/cart'; 
-            })
+            .then(result => { alert("상품을 장바구니에 담았습니다."); })
             .catch(e => {
-                if (e.response && e.response.status === 500) {
-                    alert("로그인 후 이용해 주세요");
-                    location.href = '/members/login';
-                } else {
-                    alert('Error: ' + (e.response ? e.response.data : e.message));
-                }
+                if (e.response && e.response.status === 500) { alert("로그인 후 이용해 주세요"); location.href = '/members/login'; }
+                else { alert('Error: ' + (e.response ? e.response.data : e.message)); }
             });
     }
 
-    // 주문하기
     function orderJS() {
-        const orderItemData = {
-            itemId: document.getElementById('itemId').value,
-            count: document.getElementById('count').value
-        };
+        const orderItemData = { itemId: document.getElementById('itemId').value, count: document.getElementById('quantity').value };
         orderItemFn(orderItemData)
-            .then(result => {
-                alert('주문이 완료되었습니다.');
-                location.href = '/'; // 주문 완료 후 메인 페이지로 이동
-            })
+            .then(result => { alert('주문이 완료되었습니다.'); location.href = '/'; })
             .catch(e => {
-                if (e.response && e.response.status === 500) {
-                    alert("로그인 후 이용해 주세요");
-                    location.href = '/members/login';
-                } else {
-                    alert('Error: ' + (e.response ? e.response.data : e.message));
-                }
+                if (e.response && e.response.status === 500) { alert("로그인 후 이용해 주세요"); location.href = '/members/login'; }
+                else { alert('Error: ' + (e.response ? e.response.data : e.message)); }
             });
     }
 </script>

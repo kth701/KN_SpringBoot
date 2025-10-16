@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name="order_item")
 @Getter
@@ -32,6 +30,34 @@ public class OrderItem extends BaseEntity {
 
 //    private LocalDateTime regTime;
 //    private LocalDateTime updateTime;
+
+
+    // 상품을 주문할 경우 :  상품정보를 기준으로 => 주문상품 정보 생성하여 보관
+    // 주문 상품에 대한 정보 설정하기(상품정보, 수량)
+    public static OrderItem createOrderItem(Item item, int count){
+        // 전달 받은 상품정보, 수량은 주문상품에 저장
+        OrderItem orderItem = new OrderItem();
+
+        orderItem.setItem(item);        // 주문할 상품 등록
+        orderItem.setCount(count);      // 주문할 상품 수량
+        orderItem.setOrderPrice(item.getPrice());   // 주문할 상품 가격
+
+        // 주문 상품 수량만큼 재고 수량 감소
+        item.removeStock(count);
+        return orderItem;
+    }
+
+    //  주문 상품의 금액 계산
+    public int getTotalPrice(){
+        return orderPrice * count;
+    }
+
+    // 주문 취소 => 주문상품 수량만큼 재고 수량 증가
+    public void cancel(){
+        this.getItem().addStock(count);
+    }
+
+
 
 }
 /*
