@@ -38,9 +38,9 @@ public class OrderItem extends BaseEntity {
         // 전달 받은 상품정보, 수량은 주문상품에 저장
         OrderItem orderItem = new OrderItem();
 
-        orderItem.setItem(item);        // 주문할 상품 등록
+        orderItem.setItem(item);          // 주문할 상품 등록
         orderItem.setCount(count);      // 주문할 상품 수량
-        orderItem.setOrderPrice(item.getPrice());   // 주문할 상품 가격
+        orderItem.setOrderPrice(item.getPrice());   // 주문할 상품 가격: (차후-> 시간에 따른 가격변동, 쿠폰, 할인 적용 케이스_
 
         // 주문 상품 수량만큼 재고 수량 감소
         item.removeStock(count);
@@ -73,7 +73,7 @@ public class OrderItem extends BaseEntity {
 /* 주문서에 주문할 주문상품 관계 맵핑
  하나의 주문서에는 여러 주문 상품을 담을 수 있는 관계
 
-Orders      <--- 1:N --->      order_item
-order_id(PK)                   order_item_id(PK), order_id(FK)
-...                            ...
+Orders      <--- 1:N --->        order_item
+order_id(PK),...                     order_item_id(PK), order_id(FK), ...
+
  */

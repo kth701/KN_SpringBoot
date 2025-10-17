@@ -16,6 +16,9 @@ public interface MemberRepository extends JpaRepository<Member, String> {
     @EntityGraph(attributePaths = "memberRolesList")
     @Query("select m from Member m where m.email = :email ")
     Member getWithRoles(@Param("email") String email);
+
+    // 주문서, 장바구니에 적용
+    Member findByEmail(String email); // 이메일로 회원 조회
 }
 
 

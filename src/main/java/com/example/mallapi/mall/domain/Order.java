@@ -27,10 +27,10 @@ public class Order extends BaseEntity {
     private LocalDateTime orderDate; // 주문일
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus; // 주문 상태(주문, 취소)
+    private OrderStatus orderStatus; // 주문 상태(주문:ORDER, 취소:CANCEL)
 
 
-    // 하나의 주문서에는 여러 주문 상품을 담을 수 있는 관계 설정
+    // 하나의 주문서에는 여러 주문 상품을 담을 수 있는 관계 설정:
     // 주문 상품 List객체 생성
     // 외래키가 아닌 엔티티를 주인으로 설정시 :
     //  mappedBy속성=>List객체가 주체가 아니고 List안에 있는 orders가 주체임을 명시
@@ -56,10 +56,11 @@ public class Order extends BaseEntity {
 
         // Order엔티티와 OrderItem 엔티티 양방향 참조 관계 : orderItem객체에도 order객체를 세팅(설정)
         // 1.2 현재 주문서(Order)정보를 주문상품(OrderItem)에 주문(Order)정보 등록
+        //     => OrderItem에는 주문서와 주문상품 연관관계설정 되어 있음
         orderItem.setOrder(this);
     }
 
-    // 2. 주문 내역 구성 : 주문 상품 목록, 주문 고객, 주문 상태
+    // 2. 주문 내역 구성 : 주문 상품 목록, 주문 고객(회원: 로그인회원), 주문 상태
     public static Order createOrder(Member member, List<OrderItem> orderItemList){
         // 2.1 주문내역을 처리하는 객체 생성
         Order order = new Order();

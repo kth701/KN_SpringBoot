@@ -34,24 +34,25 @@ public class OrderService {
     // 1. 상품 주문 서비스(상품 아이디, 수량, 로그인 고객:주문 고객)
     public Long order(OrderDTO orderDTO, String email){
 
-        // 1. 주문한 상품 아이디 -> 상품 정보 추출
+        // 1.1 주문한 상품 아이디 -> 상품 정보 추출(상품 상세페이지에서 주문할 상품 엔티티와 주문 수량 정보 이용) -> OrderDTO
         Item item = itemRepository.findById( orderDTO.getItemId()).orElseThrow(EntityNotFoundException::new);
-        // 2. 현재 로그인 한 회원의 이메일(아이디)를 이용해서 회원 정보 조회
-//        Member member = memberRepository.findByEmail(email);
-        // 3. 주문 상품 목록 저장할 List구조 객체 생성
+        // 1.2 현재 로그인 한 회원의 이메일(아이디)를 이용해서 회원 정보 조회
+        Member member = memberRepository.findByEmail(email);
+        // 1.3 주문 상품 목록 저장할 List구조 객체 생성
         List<OrderItem> orderItemList = new ArrayList<>();
 
-        // 4.주문상품 DTO로 통해 주문 상품 Entity객체 생성하기
-        OrderItem orderItem = OrderItem.createOrderItem(item, orderDTO.getCount());
-        // 5. 주문상품 Entity객체를 List에 저장하기
+        // 1.4 주문상품 DTO(상품 상세페이지에서 주문할 상품 엔티티와 주문 수량:OrderDTO)로 통해 주문 상품 Entity객체 생성하기
+        OrderItem orderItem = OrderItem.createOrderItem(item, orderDTO.getCount()); // 주문 상품정보, 수량
+        //1. 5. 주문상품 Entity객체를 List에 저장하기
         orderItemList.add(orderItem);
 
-        // 6. 주문서 Entity생성 : 주문한 회원정보, 주문한 상품 List
-//        Order order = Order.createOrder(member, orderItemList);
-//        orderRepository.save(order);
+        // 1.6 주문서 Entity생성 : 주문한 회원정보, 주문한 상품 List
+        Order order = Order.createOrder(member, orderItemList);
+        // 1.7 생성한 주문 엔티티를 저장
+        orderRepository.save(order);
+        // 1.8 주문서 id 반환
+        return order.getId();
 
-//        return order.getId();
-        return 0L;
     }
 
 
@@ -148,7 +149,7 @@ public class OrderService {
     public Long orders(List<OrderDTO> orderDTOList, String email){
 
 
-//        Member member = memberRepository.findByEmail(email);
+        Member member = memberRepository.findByEmail(email);
         List<OrderItem> orderItemList = new ArrayList<>();
 
         for (OrderDTO orderDTO : orderDTOList){
@@ -165,12 +166,11 @@ public class OrderService {
         }
 
         // 5.3 주문상품(OrderItem) Entity와 주문(Order) Entity 연관 맵핑
-//        Order order = Order.createOrder(member, orderItemList);
+        Order order = Order.createOrder(member, orderItemList);
         // 5.4 생성된 Order Entity DB반영
-//        orderRepository.save(order);
+        orderRepository.save(order);
 
-//        return order.getId();
-        return 0L;
+        return order.getId();
     }
 
 
