@@ -15,7 +15,7 @@ public class OrderItemDTO {
     private String imgUrl;  // 상품 이미지 경로
 
 
-    // 생성자
+    // 생성자:  주문 상품 정보(상품이름, 상품수량, 상품가격), 주문상품 이미지 경로
     public OrderItemDTO(OrderItem orderItem, String imgUrl){
         this.itemNm     = orderItem.getItem().getItemNm();
         this.count      = orderItem.getCount();

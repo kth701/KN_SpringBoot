@@ -1,0 +1,112 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/.thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content">
+    <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-2xl font-bold text-gray-900 mb-8">구매 이력</h1>
+
+        <div class="space-y-8">
+            <!-- 주문 루프 시작 -->
+            <div th:each="order : ${orders.getContent()}" class="bg-white p-6 md:p-8 rounded-lg border border-gray-200">
+                <!-- 주문 헤더: 주문일자 및 주문취소 버튼 -->
+                <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">주문일자</p><!-- YYYY-MM-DD HH:mm:ss -->
+                        <p class="text-sm text-gray-600" th:text="${#strings.substring(order.orderDate.replace('T', ' '), 0, 16)}"></p>
+                    </div>
+                    <div>
+                        <button th:if="${order.orderStatus == T(com.example.mallapi.constant.OrderStatus).ORDER}" 
+                                th:value="${order.orderId}" 
+                                onclick="cancelOrderJS(this.value)" 
+                                class="rounded-md bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                            주문취소
+                        </button>
+                        <span th:if="${order.orderStatus == T(com.example.mallapi.constant.OrderStatus).CANCEL}" class="inline-block bg-gray-100 text-gray-600 text-sm font-medium px-3 py-2 rounded-md">취소완료</span>
+                    </div>
+                </div>
+
+                <!-- 주문 상품 목록 -->
+                <ul class="divide-y divide-gray-200">
+                    <li th:each="orderItem : ${order.orderItemDTOList}" class="flex py-4 gap-x-4">
+                        <div class="h-24 w-24 flex-none rounded-md bg-gray-100 overflow-hidden">
+                            <img th:src="${orderItem.imgUrl}" th:alt="${orderItem.itemNm}" class="h-full w-full object-cover object-center">
+                        </div>
+                        <div class="flex-auto">
+                            <h3 class="font-medium text-gray-900" th:text="${orderItem.itemNm}"></h3>
+                            <div class="mt-1 flex text-sm text-gray-500">
+                                <p th:text="${#numbers.formatInteger(orderItem.orderPrice, 0, 'COMMA')} + '원'"></p>
+                                <p class="ml-4 border-l border-gray-200 pl-4" th:text="'수량: ' + ${orderItem.count}"></p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- 주문 루프 끝 -->
+
+            <!-- 주문 내역이 없을 경우 -->
+            <div th:if="${orders.isEmpty()}" class="text-center py-16 bg-white border border-gray-200 rounded-lg">
+                <p class="text-sm text-gray-500">구매 이력이 없습니다.</p>
+            </div>
+        </div>
+
+        <!-- 페이징 처리 -->
+        <div th:if="${!orders.isEmpty()}" th:with="start=${(orders.number/maxPage)*maxPage+1}, end=${orders.totalPages==0 ? 1 : (start+(maxPage-1) < orders.totalPages ? start+(maxPage-1): orders.totalPages)}" class="mt-8">
+            <nav class="flex items-center justify-center gap-x-2">
+                <a th:href="${orders.first} ? '#' : '/orders/' + ${orders.number-1}" 
+                   th:class="${orders.first} ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'" 
+                   class="min-w-[36px] h-9 flex items-center justify-center rounded-md px-2 text-sm font-medium">Previous</a>
+                
+                <div th:each="page: ${#numbers.sequence(start, end)}">
+                    <a th:href="'/orders/' + ${page-1}" 
+                       th:text="${page}" 
+                       th:class="${orders.number == page-1} ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-100'" 
+                       class="min-w-[36px] h-9 flex items-center justify-center rounded-md text-sm font-medium cursor-pointer"></a>
+                </div>
+
+                <a th:href="${orders.last} ? '#' : '/orders/' + ${orders.number+1}" 
+                   th:class="${orders.last} ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'" 
+                   class="min-w-[36px] h-9 flex items-center justify-center rounded-md px-2 text-sm font-medium">Next</a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Axios & Custom JS -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script th:src="@{/axiosJS/axiosOrder.js}"></script>
+</div>
+
+<!-- 현재 페이지에서만 사용하는 CSS정의 -->
+<style layout:fragment="mystyle" th:inline="css">
+    /* Custom styles can be added here if needed */
+</style>
+
+<!-- 현재 페이지에서만 사용하는 javasscript 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+    function cancelOrderJS(orderId) {
+        if (!confirm("정말로 주문을 취소하시겠습니까?")) {
+            return;
+        }
+
+        const paramData = { orderId: orderId };
+
+        cancelOrderId(paramData)
+            .then(result => {
+                alert('주문이 취소되었습니다.');
+                location.reload(); // 페이지를 새로고침하여 변경사항을 반영
+            })
+            .catch(e => {
+                console.error('주문 취소 실패', e);
+                if (e.response && e.response.status === 401) {
+                    alert('로그인 후 이용해 주세요.');
+                    location.href = '/members/login';
+                } else {
+                    alert('주문 취소 중 오류가 발생했습니다: ' + (e.response ? e.response.data : e.message));
+                }
+            });
+    }
+</script>
+
+</html>

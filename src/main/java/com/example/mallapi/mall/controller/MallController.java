@@ -30,12 +30,12 @@ public class MallController {
             Optional <Integer> page,
             Model model){
         // 페이징 설정
-        Pageable pageable = PageRequest.of(page.isPresent()?page.get(): 0, 3);
+        Pageable pageable = PageRequest.of(page.isPresent()?page.get(): 0, 2);
         Page<MainItemDTO> items = itemService.getMainItemPage(itemSearchDTO, pageable);
 
         model.addAttribute("items", items);
         model.addAttribute("itemSearchDTO", itemSearchDTO);
-        model.addAttribute("maxPage",3); // 페이지블럭(화면에 보여질 페이지 범위)
+        model.addAttribute("maxPage",5); // 페이지블럭(화면에 보여질 페이지 범위)
 
         log.info("=>index:"+items.getContent());
 

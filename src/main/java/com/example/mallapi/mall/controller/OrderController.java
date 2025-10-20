@@ -81,13 +81,15 @@ public class OrderController {
             @PathVariable("page")Optional<Integer> page,
             Model model
     ){
-        // 페이지 설정
+        // 페이지 설정: 한 번에 가지고 올 주문서 개수 및 시작 페이지 인덱스 번호
         Pageable pageable = PageRequest.of(page.isPresent()?page.get(): 0, 2);
 
-        // 현재 로그인한 회원의 이메일과 페이징 객체를 인자로 전달하여 구매이력 조회
+        // 현재 로그인 한 회원의 이메일과 페이징 객체를 인자로 전달하여 구매이력 조회
         Page<OrderHistDTO> orderHistDTOSList =
-                orderService.getOrderList(principal.getName(), pageable);
-        //orderService.getOrderList("test@email.com", pageable); // 테스트
+                //orderService.getOrderList(principal.getName(), pageable); // Security 로그인  적용시 주석 제거
+
+        // Security 로그인 미 적용시 테스트용 로그인 한 회원 이메일 정보
+        orderService.getOrderList("user1@test.com", pageable); // 테스트
 
 
         model.addAttribute("orders", orderHistDTOSList);
@@ -96,7 +98,7 @@ public class OrderController {
 
         log.info("==> 구매이력: OrderController");
         orderHistDTOSList.getContent().forEach( o -> log.info(o));
-        return "order/orderHist";
+        return "mall/order/orderHist";
     }
 
     // 3. 주문 취소 처리

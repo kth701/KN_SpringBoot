@@ -11,10 +11,12 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // 1. 현재 로그인 사용자의 주문 데이터를 페이지 조건에 맞춰서 조회
-    @Query("select o from Order o where o.member.email = :email order by o.orderDate desc, o.orderStatus")
+    @Query("select o from Order o " +
+                    "where o.member.email = :email " +
+                    "order by o.orderDate desc, o.orderStatus")
     List<Order> findOrder(@Param("email") String email, Pageable pageable);
 
-    // 2. 현재 로그인 한 회원의 주문 개수가 몇 개인지 조회
+    // 2. 현재 로그인 한 회원의 주문서 개수가 몇 개인지 조회
     @Query("select count(o) from Order o where o.member.email = :email ")
     Long countOrder(@Param("email") String email);
 

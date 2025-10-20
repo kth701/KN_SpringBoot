@@ -16,9 +16,9 @@ import java.util.List;
 @Getter
 @ToString
 public class OrderHistDTO {
-    private Long orderId;           // 주문 아이디
-    private String orderDate;      // 주문 날짜 => 날짜 형식 전환
-    private OrderStatus orderStatus;// 주문 상태(주문, 취소)
+    private Long orderId;                     // 주문서 ID(아이디)
+    private String orderDate;               // 주문 날짜 => 날짜 형식 전환
+    private OrderStatus orderStatus;    // 주문 상태(주문:ORDER, 취소:CANCEL)
     // 주문 상품 리스트
     private List<OrderItemDTO> orderItemDTOList =new ArrayList<>();
 
