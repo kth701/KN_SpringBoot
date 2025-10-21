@@ -14,8 +14,9 @@
                 <!-- 주문 헤더: 주문일자 및 주문취소 버튼 -->
                 <div class="flex justify-between items-center pb-4 border-b border-gray-200 mb-4">
                     <div>
-                        <p class="text-sm font-medium text-gray-900">주문일자</p><!-- YYYY-MM-DD HH:mm:ss -->
-                        <p class="text-sm text-gray-600" th:text="${#strings.substring(order.orderDate.replace('T', ' '), 0, 16)}"></p>
+                        <p class="text-sm font-medium text-gray-900">주문일자</p>
+                        <!-- #temporals.format 대신 #strings.substring을 사용하여 날짜 형식 변환 -->
+                        <p class="text-sm text-gray-600" th:text="${#strings.substring(order.orderDate.toString().replace('T', ' '), 0, 16)}"></p>
                     </div>
                     <div>
                         <button th:if="${order.orderStatus == T(com.example.mallapi.constant.OrderStatus).ORDER}" 
@@ -32,7 +33,7 @@
                 <ul class="divide-y divide-gray-200">
                     <li th:each="orderItem : ${order.orderItemDTOList}" class="flex py-4 gap-x-4">
                         <div class="h-24 w-24 flex-none rounded-md bg-gray-100 overflow-hidden">
-                            <img th:src="${orderItem.imgUrl}" th:alt="${orderItem.itemNm}" class="h-full w-full object-cover object-center">
+                            <img th:if="${orderItem.imgUrl != null}" th:src="${orderItem.imgUrl}" th:alt="${orderItem.itemNm}" class="h-full w-full object-cover object-center">
                         </div>
                         <div class="flex-auto">
                             <h3 class="font-medium text-gray-900" th:text="${orderItem.itemNm}"></h3>

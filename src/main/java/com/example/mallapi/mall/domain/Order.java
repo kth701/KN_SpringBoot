@@ -93,8 +93,9 @@ public class Order extends BaseEntity {
 
     // 4. 주문 상품 취소시 : 상품재고 재구성
     public void cancelOrder(){
-        // 주문상태 -> 주문 취소 전환
+        // 주문상태 변경: 주문 상태 -> 주문 취소 상태로 전환
         this.orderStatus = OrderStatus.CANCEL;
+
         // 주문상품 목록에 있는 상품수량을 가지고 상품재고 수정
         for (OrderItem orderItem: orderItems){
             orderItem.cancel();

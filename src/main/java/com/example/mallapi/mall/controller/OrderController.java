@@ -104,14 +104,15 @@ public class OrderController {
     // 3. 주문 취소 처리
     @PostMapping(value="/order/{orderId}/cancel")
     public @ResponseBody ResponseEntity cancelOrder(
-            Principal principal,
+            Principal principal, // Security 로그인시 email(username)
             @PathVariable("orderId") Long orderId ){
 
-        //String email = "test@email.com";// 테스트
+        // Security 로그인 미적용시 테스트용 username, Security 로그인 적용시 주석 처리
+        String email = "user1@test.com";// Security 로그인 미적용시 테스트용 username
 
         // 주문 취소시 현재 취소한 사용자(로그인)가 주문자인지 권한 검사
-        //if (!orderService.validateOrder(orderId, email)){
-        if (!orderService.validateOrder(orderId, principal.getName())){
+       // if (!orderService.validateOrder(orderId, principal.getName())){
+        if (!orderService.validateOrder(orderId, email)){
             return new ResponseEntity("주문 취소 권한이 없습니다.", HttpStatus.FORBIDDEN);
         }
 

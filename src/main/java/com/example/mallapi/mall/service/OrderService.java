@@ -58,9 +58,12 @@ public class OrderService {
 
 
     // 2. 주문 이력(주문 상품 목록) 서비스: => 현재 로그인 아이디와 페이징 조건 이용하여 주문 목록 조회
+    //  => 현재 로그인 회원 email(username)으로  => 모든 주문서 및 주문서 개수 추출 => 각각 주문서에 있는 주문상품 추출
+    //  => 각각의 주문 상품에 대한 주문 상품 이미지 추출
     @Transactional(readOnly = true)
     public Page<OrderHistDTO> getOrderList(String email, Pageable pageable){
         // 1. 사용자 아이디와 페이징 조건을 이용해 주문 목록(주문서1,주문서2,..) 요청
+        //      => 현재 로그인 회원의 주문한 모든 주문서 추출
         List<Order> orders  = orderRepository.findOrder(email, pageable);
         // 2. 총 주문 개수: 현재 로그인 한 회원의 주문서 개수
         Long totalCount = orderRepository.countOrder(email);
@@ -120,13 +123,14 @@ public class OrderService {
     // 3. 주문 취소시 : 로그인 한 사용자와 주문 데이터를 생성한 사용자가 같은지 검사
     @Transactional(readOnly = true)
     public boolean validateOrder(Long orderId, String email){
-        //  3.1 현재 로그인 회원의 이메일 정보 => principal.getName()
+        //  3.1 현재 로그인 회원의 이메일 정보 => email은 principal.getName() 반환값
         Member currMember = memberRepository.findByEmail(email);
 
         // 3.2 주문서에 등록된 회원 정보(이메일) : 실제 주문한 회원 이메일
         Order order = orderRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
         // 3.3 주문서에 등록 회원 이메일 정보 추출
         Member savedMember = order.getMember();
+
 
         // 3.4 현재 로그인한 회원 이메일과 주문서에 등록된 회원이메일 동일한지 검사
         if (!StringUtils.equals(currMember.getEmail(), savedMember.getEmail()))
