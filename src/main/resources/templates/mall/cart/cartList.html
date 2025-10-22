@@ -1,0 +1,350 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/.thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content">
+    <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-2xl font-bold text-gray-900 mb-8">장바구니</h1>
+
+        <div class="lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
+            <!-- 장바구니 목록 (테이블 구조 유지) -->
+            <section aria-labelledby="cart-heading" class="lg:col-span-8">
+                <h2 id="cart-heading" class="sr-only">장바구니에 담긴 상품</h2>
+                
+                <table class="w-full">
+                    <thead class="sr-only">
+                        <tr>
+                            <th>선택</th>
+                            <th>상품 정보</th>
+                            <th>상품 금액</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-t border-b border-gray-200 divide-y divide-gray-200">
+                        <!-- 전체 선택 헤더 -->
+                        <tr class="bg-gray-50">
+                            <td colspan="3" class="py-4 px-4 sm:px-6">
+                                <input type="checkbox" id="checkall" name="checkall" onclick="checkAllJS()" class="form-check-input h-4 w-4 border-gray-300 rounded text-indigo-600 focus:ring-indigo-500"/>
+                                <label for="checkall" class="ml-3 text-sm font-medium text-gray-900">전체선택</label>
+                            </td>
+                        </tr>
+
+                        <!-- 상품 목록 -->
+                        <tr th:each="cartItem : ${cartItems}" class="py-6 px-4 sm:px-6">
+                            <td class="align-middle py-6 px-4 sm:px-6">
+                                <input type="checkbox" name="cartChkBox" th:value="${cartItem.cartItemId}" th:id="'cartChkBox_' + ${cartItem.cartItemId}" class="form-check-input h-4 w-4 border-gray-300 rounded text-indigo-600 focus:ring-indigo-500"/>
+                            </td>
+                            <td class="py-6">
+                                <div class="flex items-center">
+                                    <img th:src="${cartItem.imgUrl}" th:alt="${cartItem.itemNm}" class="w-24 h-24 rounded-md object-center object-cover sm:w-32 sm:h-32">
+                                    <div class="ml-6 flex-1 flex flex-col">
+                                        <h3 class="font-medium text-gray-800" th:text="${cartItem.itemNm}"></h3>
+                                        <div class="mt-1 text-sm text-gray-600" th:id="'price_' + ${cartItem.cartItemId}" th:data-price="${cartItem.price}" th:text="${#numbers.formatInteger(cartItem.price, 0, 'COMMA')} + '원'"></div>
+                                        <div class="mt-4 flex items-center">
+                                            <label th:for="'count_' + ${cartItem.cartItemId}" class="sr-only">수량</label>
+                                            <input type="number" name="count" th:value="${cartItem.count}" min="1" th:id="'count_' + ${cartItem.cartItemId}" onchange="changeCountJS(this)" class="form-control" style="width: 80px; text-align: center;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="align-middle py-6 px-4 sm:px-6">
+                                <div class="flex flex-col items-end space-y-2">
+                                    <div class="text-base font-semibold text-gray-900" th:id="'totalPrice_' + ${cartItem.cartItemId}" name="totalPrice">
+                                        [[${#numbers.formatInteger(cartItem.price * cartItem.count, 0, 'COMMA')}]]원
+                                    </div>
+                                    <button type="button" class="close text-red-500 hover:text-red-700 font-medium text-sm" onclick="deleteCartItemJS(this)">
+                                        <span th:data-id="${cartItem.cartItemId}">삭제</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(cartItems)}">
+                            <td colspan="3" class="text-center py-16 text-sm text-gray-500">장바구니에 담긴 상품이 없습니다.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 주문 요약 -->
+            <section aria-labelledby="summary-heading" class="mt-16 bg-gray-50 rounded-lg px-4 py-6 sm:p-6 lg:p-8 lg:mt-0 lg:col-span-4">
+                <h2 id="summary-heading" class="text-lg font-medium text-gray-900">주문 요약</h2>
+                <dl class="mt-6 space-y-4">
+                    <div class="flex items-center justify-between border-t border-gray-200 pt-4">
+                        <dt class="text-base font-medium text-gray-900">총 주문 금액</dt>
+                        <dd class="text-xl font-bold text-indigo-600"><span id="orderTotalPrice">0</span> 원</dd>
+                    </div>
+                </dl>
+                <div class="mt-6">
+                    <button type="button" onclick="ordersJS()" class="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700">주문하기</button>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- 기존 스크립트는 변경하지 않고 그대로 사용 -->
+<script layout:fragment="myscript" th:inline="javascript">
+    // All existing javascript and jQuery functions will remain here...
+    // ----------------------------------------------------------- //
+   // 1. javascript
+   // ----------------------------------------------------------- //
+
+   /* jQuery 적용시 주석 처리 */
+
+   // 1. 체크박스 DOM 그룹핑(유사배열)=> map(), filter() 사용불가 => 유사배열을 배열전환(배열 = [...유사배열])
+   const checkItems = document.querySelectorAll('input[name=cartChkBox]')
+   console.log('체크 박스 전체 개수:' , checkItems.length)
+
+   // ----------------------------------------------------------------------- //
+   // javascript 확장 : 배열요소  of 배열구조, 객체 속성 변수 in 객체
+   // 2. 체크박스 change 이벤트 처리
+   //    : 장바구니에 있는 상품항목 체크여부에 따른 총금액 계산
+   // ----------------------------------------------------------------------- //
+
+   for (let checkItem of checkItems){
+     checkItem.addEventListener('change', (e) => {
+
+       // 이벤트가 발생한 객체요소 사용시 : 반드시 이벤트발생객체.target
+       let item = e.target
+
+       console.log(item)
+       console.log(item.getAttribute('id'), item.checked)
+
+       // 장바구니 상품 항목중에 체크된 항목만 총금액 계산 처리
+       getOrderTotalPriceJS()
+
+     })
+   }
+
+
+   // ---------------------------------------------------------- //
+   // 3. 장바구니 상품중에 체크된 상품 총금액 계산처리하는 메서드
+   // ---------------------------------------------------------- //
+   function getOrderTotalPriceJS(){
+     let orderTotalPrice = 0
+     let isCheckItems = document.querySelectorAll('input[name=cartChkBox]:checked') // 체크된 항목만 그룹핑
+     console.log('checked item count:', isCheckItems.length)
+
+     // 3.1 전체항목 개수와 항목개수 일치여부확인 => 전체항목 체크 설정
+     if(isCheckItems.length == checkItems.length) {
+       document.querySelector('#checkall').checked = true
+     } else {
+       document.querySelector('#checkall').checked = false
+     }
+
+     // 3.2 체크된 항목 총 금액 계산
+     for (let isCheckItem of isCheckItems){
+       let cartItemId = isCheckItem.value;                               // isCheckItem.getAttribute('value')
+       let price = document.querySelector('#price_'+cartItemId).getAttribute('data-price')
+       let count = document.querySelector('#count_'+cartItemId).value;   //  or .getAttribute('value')
+
+       orderTotalPrice += (price * count)
+
+       console.log("--------------------")
+       console.log('cartItemId=>', cartItemId)
+       console.log('price=>', price)
+       console.log('count=>', count)
+       console.log('orderTotalPrice=>', orderTotalPrice)
+
+     }
+
+     // 3.3 총금액 계산 결과값 DOM에 View
+     // 콤마를 제거하는 정규식 : 문자열.replace(/[^\d]+/g, "") => 12,100 => 12100
+     // 숫자 -> 문자열 -> 3자리마다 콤마 표현 정규식
+     document.querySelector('#orderTotalPrice').innerHTML =
+             orderTotalPrice.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+   }
+   // ------------------------------------------------------- //
+
+
+   // 4. 전체 항목 체크 여부확인후 주문상품 모든 항목 체크 설정
+   function checkAllJS(){
+     //console.log('전체 체크')
+
+     let checkAll = document.querySelector('#checkall')
+
+     // 4.1 전체 체크 여부 설정하기
+     checkAll.addEventListener('change', () => {
+
+       if (checkAll.checked){
+         // 4.2 상품항목 모두 체크 상태로 전환
+         for (let item of checkItems){// checkItems 전역변수
+           item.checked = true
+         }
+       } else {
+         // 4.2 상품항목 모두 미체크 상태로 전환
+         for (let item of checkItems){// checkItems 전역변수
+           item.checked = false
+         }
+       } // end if
+
+
+     // 4.3 전체체크 여부 이벤트 설정한 후 총금액 계산
+     getOrderTotalPriceJS()
+
+     })// end addEventListener
+
+
+   }
+
+   // ------------------------------------------------------------------------ //
+   // Axios로 처리하는 함수 선언
+   // ------------------------------------------------------------------------ //
+
+   /*
+   // 장바구니 상품 수량 변경 서버에 요청하기
+   async function updateCartItemCountJS(cartItemId, count){
+     const response = await axios.patch('/cartItem/'+ cartItemId  + '?count='+count)
+     //console.log('서버로부터 응답결과:', response.data)
+
+     return response
+
+   }
+   // 장바구니 상품 취소(삭제) 서버에 요청하기
+   async function deleteCartItemJSAxios(cartItemId){
+     const response = await axios.delete('/cartItem/'+cartItemId)
+     return response
+   }
+   */
+   // ------------------------------------------------------------------------ //
+   // 5. Axios처리 : 장바구니 수량 변경 요청시 : 장바구니 상품 수량 변경 요청
+   // ------------------------------------------------------------------------ //
+   function changeCountJS(obj){ // 수량의 값을 가지고 있는 input요소 자체가 넘어옴
+     // let _csrf = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+     // let _csrf_header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+     //document.querySelector('#count_xxxx').value
+     //console.log(obj)
+     //console.log('수량변경발생:',obj.value)
+
+     let count = obj.value
+     let cartItemId = obj.id.split('_')[1] // 주문상품 id값 추출
+     let price = document.querySelector('#price_'+cartItemId).getAttribute('data-price')
+     let totalPrice = count * price
+
+     // 콤마를 제거하는 정규식 : 문자열.replace(/[^\d]+/g, "") => 12,100 => 12100
+     // 숫자 -> 문자열 -> 3자리마다 콤마 표현 정규식
+     let fmt_totalPrice = totalPrice.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+     //console.log(cartItemId, count, price, totalPrice, fmt_totalPrice)
+
+     // 5.1  총금액 계산 결과값 DOM에 View: 3자리마다 콤마 정규식 표현 적용
+     document.querySelector('#totalPrice_'+cartItemId).innerHTML = fmt_totalPrice + '원'
+
+
+     // 5.2 수량 변경시 총 금액 계산
+     getOrderTotalPriceJS()
+
+     // ------------------------------------------------------------------------------------------- //
+     // 5.3 axios비동기 처리 : 변경된 장바구니 상품 수량을 서버에 전송하여 장바구니 상품수량에 반영
+     // ------------------------------------------------------------------------------------------- //
+     updateCartItemCountJS(cartItemId, count)
+             .then( (res) => {
+                 //console.log(res)
+                 //console.log(res.data)
+                 //console.log('success code:'+res.status)
+             })
+             .catch((e)=>{console.log('error code:'+e)})
+
+   // jQuery 일 경우
+   // 수량 변경시 총 금액 계산
+   // getOrderTotalPriceJQuery()
+
+
+   }
+
+   // ------------------------------------------------------------------------------------------- //
+   // 6. 장바구니 상품 항목 취소(삭제)
+   // ------------------------------------------------------------------------------------------- //
+   function deleteCartItemJS(obj){
+     //console.log('delete')
+
+     //console.log(obj)
+     //console.log(document.querySelector('#cartItemId').getAttribute('data-id'))
+     //console.log('=> 상품 취소:'+obj.getAttribute('data-id'))
+
+     let cartItemId = obj.getAttribute('data-id')
+     //console.log('삭제할 장바구니 상품 id:'+cartItemId)
+
+
+     // 6.1 Axios로 방식으로 서버에 장바구니 상품 삭제 요청
+     deleteCartItemJSAxios(cartItemId)
+           .then( (res) => {
+             //console.log(res)
+
+             alert('장바구니에서 주문 상품을 취소하였습니다.')
+             location.href = '/cart'
+           })
+           .catch( (e) => {
+               //console.log( 'error=>', e)
+               if (e.status == '401'){
+                 alert('로그인 후 이용해 주세요.')
+                 location.href= '/members/login'
+               }else {
+                 console.log('error code:', e.status)
+               }
+
+           })
+
+
+   }
+
+   // ------------------------------------------------------------------------------------------- //
+   // 7. 장바구니 상품을 주문상품으로 요청하기
+   // ------------------------------------------------------------------------------------------- //
+   function ordersJS(){
+     //console.log('주문하기')
+
+     // 7.1  하나의 장바구니에는 여러 주문상품이 존재, 이 상품을 저장할 List구조 객체 생성
+     let dataList = new Array();
+     let paramData = new Object(); // JSON구조 객체
+
+
+     // 7.2 체크된 항목만 그룹핑
+     let isCheckItems = document.querySelectorAll('input[name=cartChkBox]:checked')
+
+     // 7.3 체크된 항목: 주문할 상품 가져와 배열에 저장
+     for (let isCheckItem of isCheckItems){
+         let cartItemId = isCheckItem.value;  // isCheckItem.getAttribute('value')
+
+         // 7.4 장바구니 주문상품 아이디를 JSON객체에 저장
+         let data = new Object()
+         data["cartItemId"] = cartItemId;    // => { cartItemId: cartItemId }
+
+         // 7.5 장바구니에 체크된 주문 상품 배열에 담아 놓기: 주문할 상품아이디를 배열에 저장
+         dataList.push(data)
+     } // end for
+
+     // 7.6 서버에 파라미터(매개변수)로 전달하기 위해 객체에 저장
+     paramData['cartOrderDTOList'] = dataList    // => { cartOrderDTOList: dataList }
+
+     // 7.7 JSON구조형을 가진 문자열형태로 전환(Ajax 인 경우)
+     let param = JSON.stringify(paramData) //
+
+     console.log(paramData)
+     //console.log(param)
+
+
+       // 7.8 Axios : 장바구니 상품 주문하기 요청
+       ordersCartItemJSAxios(paramData)
+               .then( (res) => {
+                   //console.log( 'success', res)
+                   alert('주문이 완료 되었습니다.')
+                   location.href='/orders'
+               })
+               .catch((e) => {
+                   //console.log( 'error=>', e)
+                   if (e.status == '401'){
+                     alert('로그인 후 이용해 주세요.')
+                     location.href= '/members/login'
+                   }else {
+                     console.log('error code:', e.status)
+                   }
+               })
+
+
+   }
+</script>
+
+</html>

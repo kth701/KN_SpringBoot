@@ -8,7 +8,7 @@ import lombok.Setter;
 @Entity
 @Table(name="cart_item")
 @Getter@Setter
-public class CartItem {
+public class CartItem extends BaseEntity {
     @Id // 기본키 설정
     @GeneratedValue(strategy = GenerationType.IDENTITY)// auto_incrument 적용
     @Column(name="cart_item_id")

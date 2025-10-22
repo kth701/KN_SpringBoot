@@ -22,6 +22,8 @@ import org.thymeleaf.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -46,8 +48,8 @@ public class CartService {
         // 1.2 현재 로그인한 회원 조회
         Member member = memberRepository.findByEmail(email);
 
-        // 1.3 현재로그인 회원(email)로 장바구니 찾아 오기" : Long.valueOf()=>???
-        Cart cart = cartRepository.findByMemberEmail(Long.valueOf(member.getEmail()));
+        // 1.3 현재로그인 회원(email)로 장바구니 찾아 오기
+        Cart cart = cartRepository.findByMemberEmail(member.getEmail());
 
         // 1.4 회원의 장바구니 없을 경우 장바구니 생성:  특정 회원이 장바구니 호출을 한번도 사용하지 않은 경우
         if (cart == null){
@@ -72,15 +74,17 @@ public class CartService {
     }
 
     // -------------------------------------------------------------------- //
-    // 2. 로그인한 회원의 장바구니 상품 조회
+    // 2. 로그인한 회원의 정보를 이용하여 장바구니에 담긴 장바구니 상품 조회
     // -------------------------------------------------------------------- //
     @Transactional(readOnly = true)
     public List<CartDetailDTO> getCartList(String email){
+
+        // email => Security 로그인 성공시 principal.getName()값인 username
         List<CartDetailDTO> cartDetailDTOList = new ArrayList<>();
 
         // 2.1 로그인한 회원의 정보
         Member member = memberRepository.findByEmail(email);
-        Cart cart = cartRepository.findByMemberEmail(Long.valueOf(member.getEmail()));// 장바구니와 회원아이디 맵핑관계
+        Cart cart = cartRepository.findByMemberEmail(member.getEmail());// 장바구니와 회원아이디 맵핑관계
 
         // 2.2 장바구니 엔티티가 없으면 비어 있는 List반환
         if (cart == null){
@@ -181,3 +185,4 @@ public class CartService {
     }
 
 }
+

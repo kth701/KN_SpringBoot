@@ -46,8 +46,8 @@ public class CartController {
         }
 
         // 1.2 현재 로그인한 회원의 이메일(아이디)정보를 추출
-        //String email = "test@email.com";
-        String email = principal.getName();
+        String email = "user1@test.com";
+//        String email = principal.getName();
         Long cartItemId;
 
         try {
@@ -65,11 +65,11 @@ public class CartController {
     // 2. 장바구니 페이지 이동
     @GetMapping(value="/cart")
     public String orderHist(
-            Principal principal,
+            Principal principal, // Security 로그인 회원 정보 추출: username(email)
             Model model){
 
-        //String email = "test@email.com";// test
-        String email = principal.getName();
+        String email = "user1@test.com";// test용 => Security 로그인 적용시 주석 처리
+        //String email = principal.getName();
 
         // 현재 로그인한 회원의 장바구니 상품 조회
         List<CartDetailDTO> cartDetailDTOList = cartService.getCartList(email);
@@ -77,7 +77,7 @@ public class CartController {
 
         // 장바구니 상품 조회 결과 객체에 담아 View페이지 이동
         model.addAttribute("cartItems", cartDetailDTOList);
-        return "cart/cartList";
+        return "mall/cart/cartList";
     }
 
     // ------------------------------------------------------------------------ //
@@ -92,8 +92,8 @@ public class CartController {
     ){
         log.info("==> 주문상품:"+cartItemId+","+count);
 
-        String email = principal.getName();
-        //String email = "test@email.com"; // test
+        //String email = principal.getName();
+        String email = "user1@test.com"; // test
 
         if (count <= 0 ){
             // 장바구니 상품 개수가 0이하면 에러메시지와 상태코드 반환
@@ -119,8 +119,8 @@ public class CartController {
     ){
 
         // 4.1 로그인한 회원의 장바구니인지 판별
-        String email = principal.getName();
-        //String email = "test@email.com"; // test
+        //String email = principal.getName();
+        String email = "user1@test.com"; // test
         if(!cartService.validateCartItem(cartItemId, email)){
             return new ResponseEntity<String>("삭제 권한이 없습니다. ", HttpStatus.FORBIDDEN);
         }

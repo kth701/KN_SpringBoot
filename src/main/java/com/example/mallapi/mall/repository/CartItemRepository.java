@@ -15,10 +15,10 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     // 2. 장바구니 페이지에 전달할 CartDetailDTO리스틀 Query문로 조회
     //   : 장바구니 상품, 상품, 상품이미지  Entity
-    // 생성자를 통해 DTO반환 new com.springjpa.myproject.dto.CartDetailDTO(  ) 형식
+    // 생성자를 통해 DTO반환 new com.example.mallapi.mall.dto.CartDetailDTO(  ) 형식
     // 2.1
     @Query("""
-            select new com.springjpa.myproject.dto.CartDetailDTO(  ci.id, i.itemNm, i.price, ci.count, im.imgUrl )
+            select new com.example.mallapi.mall.dto.CartDetailDTO(  ci.id, i.itemNm, i.price, ci.count, im.imgUrl )
             from
                 CartItem ci, ItemImg im
             join ci.item  i

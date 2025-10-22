@@ -15,7 +15,7 @@ public class CartDetailDTO {
 
 
 
-    // 장바구니 페이지에 전달할 데이너를 생성자의 파라미터로 전달
+    // 장바구니 페이지에 전달할 데이터를 생성자의 파라미터로 전달
     public CartDetailDTO(
             Long cartItemId,
             String itemNm,
