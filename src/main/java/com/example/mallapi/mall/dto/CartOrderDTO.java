@@ -6,7 +6,7 @@ import lombok.ToString;
 
 import java.util.List;
 
-// 장바구니 페이이지에서 주문할 상품 데이터를 전달할 DTO
+// 장바구니 페이이지에서 여러개의 상품을 주문하므로 CasrtOrderDTO클래스가 자기 자신을 List로 저장
 @Getter@Setter@ToString
 public class CartOrderDTO {
     private Long cartItemId;

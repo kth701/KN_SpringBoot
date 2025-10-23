@@ -21,7 +21,7 @@
                             <th>상품 금액</th>
                         </tr>
                     </thead>
-                    <tbody class="border-t border-b border-gray-200 divide-y divide-gray-200">
+                    <tbody id="cart-items-container" class="border-t border-b border-gray-200 divide-y divide-gray-200">
                         <!-- 전체 선택 헤더 -->
                         <tr class="bg-gray-50">
                             <td colspan="3" class="py-4 px-4 sm:px-6">
@@ -43,7 +43,12 @@
                                         <div class="mt-1 text-sm text-gray-600" th:id="'price_' + ${cartItem.cartItemId}" th:data-price="${cartItem.price}" th:text="${#numbers.formatInteger(cartItem.price, 0, 'COMMA')} + '원'"></div>
                                         <div class="mt-4 flex items-center">
                                             <label th:for="'count_' + ${cartItem.cartItemId}" class="sr-only">수량</label>
-                                            <input type="number" name="count" th:value="${cartItem.count}" min="1" th:id="'count_' + ${cartItem.cartItemId}" onchange="changeCountJS(this)" class="form-control" style="width: 80px; text-align: center;">
+                                            <!-- 수량 UI 변경 -->
+                                            <div class="flex items-center border border-gray-300 rounded-md">
+                                                <button type="button" class="quantity-btn px-3 py-1 text-lg" data-type="minus" th:data-cart-item-id="${cartItem.cartItemId}">-</button>
+                                                <input type="text" name="count" th:value="${cartItem.count}" min="1" th:id="'count_' + ${cartItem.cartItemId}" onchange="changeCountJS(this)" class="w-12 text-center border-l border-r text-sm py-2 focus:outline-none">
+                                                <button type="button" class="quantity-btn px-3 py-1 text-lg" data-type="plus" th:data-cart-item-id="${cartItem.cartItemId}">+</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -82,12 +87,43 @@
             </section>
         </div>
     </div>
+
+
+    <!-- Axios :비동기 처리하는 라이브러리 (javascript:Promise)-->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!--  정적리소스:static폴더 기준 -->
+    <script th:src="@{/axiosJS/axiosOrder.js}"></script>
 </div>
 
 <!-- 기존 스크립트는 변경하지 않고 그대로 사용 -->
 <script layout:fragment="myscript" th:inline="javascript">
-    // All existing javascript and jQuery functions will remain here...
-    // ----------------------------------------------------------- //
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('cart-items-container');// tbody 클래스명
+
+        if (container) {
+            container.addEventListener('click', function(e) {
+                if (e.target.matches('.quantity-btn')) {    // plus, minus 버튼 클래스명
+                    const type = e.target.dataset.type; // plus, minus 버튼 속성 중 dataset 속성값 추출('plus', 'minus')
+                    const cartItemId = e.target.dataset.cartItemId; // dataset 속성명이 카멜 표기법인 경우 '-'제거한 이름으로 javascript인식 => ex) data-cart-item-id => cartItemId로 인식
+                    const input = document.getElementById('count_' + cartItemId);
+                    if (!input) return;
+
+                    let currentValue = parseInt(input.value);
+
+                    if (type === 'plus') {
+                        input.value = currentValue + 1;
+                    } else if (type === 'minus' && currentValue > 1) {
+                        input.value = currentValue - 1;
+                    }
+                    // 기존 onchange 함수를 트리거하여 호환성 유지
+                    // plus, minus클릭시 수량 input요소 값을 변경한 후 change이벤트 강제 발생 시킴 => change이벤트 의해 수량 input요소에서 updateCartItemCountJS()호출 됨
+                    input.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+    });
+
+   // ----------------------------------------------------------- //
    // 1. javascript
    // ----------------------------------------------------------- //
 
@@ -128,10 +164,13 @@
      console.log('checked item count:', isCheckItems.length)
 
      // 3.1 전체항목 개수와 항목개수 일치여부확인 => 전체항목 체크 설정
-     if(isCheckItems.length == checkItems.length) {
-       document.querySelector('#checkall').checked = true
-     } else {
-       document.querySelector('#checkall').checked = false
+     const checkAllEl = document.querySelector('#checkall');
+     if (checkAllEl) {
+        if(checkItems.length > 0 && isCheckItems.length === checkItems.length) {
+           checkAllEl.checked = true;
+        } else {
+           checkAllEl.checked = false;
+        }
      }
 
      // 3.2 체크된 항목 총 금액 계산
@@ -190,24 +229,25 @@
    }
 
    // ------------------------------------------------------------------------ //
-   // Axios로 처리하는 함수 선언
+   // 테스트용 : Axios로 처리하는 함수 선언
    // ------------------------------------------------------------------------ //
 
-   /*
-   // 장바구니 상품 수량 변경 서버에 요청하기
-   async function updateCartItemCountJS(cartItemId, count){
-     const response = await axios.patch('/cartItem/'+ cartItemId  + '?count='+count)
-     //console.log('서버로부터 응답결과:', response.data)
+   /* 테스트 용
+       // 장바구니 상품 수량 변경 서버에 요청하기
+       async function updateCartItemCountJS(cartItemId, count){
+         const response = await axios.patch('/cartItem/'+ cartItemId  + '?count='+count)
+         //console.log('서버로부터 응답결과:', response.data)
 
-     return response
+         return response
 
-   }
-   // 장바구니 상품 취소(삭제) 서버에 요청하기
-   async function deleteCartItemJSAxios(cartItemId){
-     const response = await axios.delete('/cartItem/'+cartItemId)
-     return response
-   }
+       }
+       // 장바구니 상품 취소(삭제) 서버에 요청하기
+       async function deleteCartItemJSAxios(cartItemId){
+         const response = await axios.delete('/cartItem/'+cartItemId)
+         return response
+       }
    */
+
    // ------------------------------------------------------------------------ //
    // 5. Axios처리 : 장바구니 수량 변경 요청시 : 장바구니 상품 수량 변경 요청
    // ------------------------------------------------------------------------ //
@@ -227,7 +267,7 @@
      // 콤마를 제거하는 정규식 : 문자열.replace(/[^\d]+/g, "") => 12,100 => 12100
      // 숫자 -> 문자열 -> 3자리마다 콤마 표현 정규식
      let fmt_totalPrice = totalPrice.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-     //console.log(cartItemId, count, price, totalPrice, fmt_totalPrice)
+     console.log(cartItemId, count, price, totalPrice, fmt_totalPrice)
 
      // 5.1  총금액 계산 결과값 DOM에 View: 3자리마다 콤마 정규식 표현 적용
      document.querySelector('#totalPrice_'+cartItemId).innerHTML = fmt_totalPrice + '원'
@@ -264,7 +304,7 @@
      //console.log(document.querySelector('#cartItemId').getAttribute('data-id'))
      //console.log('=> 상품 취소:'+obj.getAttribute('data-id'))
 
-     let cartItemId = obj.getAttribute('data-id')
+     let cartItemId = obj.querySelector('span').getAttribute('data-id')
      //console.log('삭제할 장바구니 상품 id:'+cartItemId)
 
 
@@ -296,52 +336,44 @@
    function ordersJS(){
      //console.log('주문하기')
 
-     // 7.1  하나의 장바구니에는 여러 주문상품이 존재, 이 상품을 저장할 List구조 객체 생성
-     let dataList = new Array();
-     let paramData = new Object(); // JSON구조 객체
+    // 장바구니 상품에서 체크된 항목 추출
+     const checkedItems = document.querySelectorAll('input[name=cartChkBox]:checked');
 
-
-     // 7.2 체크된 항목만 그룹핑
-     let isCheckItems = document.querySelectorAll('input[name=cartChkBox]:checked')
-
-     // 7.3 체크된 항목: 주문할 상품 가져와 배열에 저장
-     for (let isCheckItem of isCheckItems){
-         let cartItemId = isCheckItem.value;  // isCheckItem.getAttribute('value')
-
-         // 7.4 장바구니 주문상품 아이디를 JSON객체에 저장
-         let data = new Object()
-         data["cartItemId"] = cartItemId;    // => { cartItemId: cartItemId }
-
-         // 7.5 장바구니에 체크된 주문 상품 배열에 담아 놓기: 주문할 상품아이디를 배열에 저장
-         dataList.push(data)
-     } // end for
-
-     // 7.6 서버에 파라미터(매개변수)로 전달하기 위해 객체에 저장
-     paramData['cartOrderDTOList'] = dataList    // => { cartOrderDTOList: dataList }
-
-     // 7.7 JSON구조형을 가진 문자열형태로 전환(Ajax 인 경우)
-     let param = JSON.stringify(paramData) //
-
-     console.log(paramData)
-     //console.log(param)
+     if (checkedItems.length === 0) {
+         alert("주문할 상품을 선택해주세요.");
+         return;
+     }
+     // Array.from() 은 문자열 등 유사 배열(Array-like:태그배열) 객체나 이터러블한 객체를 배열로 만들어주는 메서드
+     // map()은 배열만 적용됨, 유사배열은 적용안됨
+     const cartOrderDTOList = Array.from(checkedItems).map(checkbox => {
+         return { cartItemId: checkbox.value };
+     });
+     const requestData = {
+         cartOrderDTOList: cartOrderDTOList
+     };
+    console.log("=> 장바구니 상품 주문 요청 데이터: ", requestData);
 
 
        // 7.8 Axios : 장바구니 상품 주문하기 요청
-       ordersCartItemJSAxios(paramData)
+       //           => { "cartOrderDTOList":
+       //                       [{"cartItemId": cartItemId1},{"cartItemId": cartItemId2},...]
+       //                 } 형식객체 서버에 전달됨
+       ordersCartItemJSAxios(requestData)
                .then( (res) => {
                    //console.log( 'success', res)
                    alert('주문이 완료 되었습니다.')
                    location.href='/orders'
                })
-               .catch((e) => {
-                   //console.log( 'error=>', e)
-                   if (e.status == '401'){
-                     alert('로그인 후 이용해 주세요.')
-                     location.href= '/members/login'
-                   }else {
-                     console.log('error code:', e.status)
-                   }
-               })
+               .catch( error => {
+                   console.error('error=>', error);
+                     if (error.response && error.response.status === 401) {
+                         alert('로그인 후 이용해 주세요.');
+                         location.href = '/members/login';
+                     } else {
+                         const errorMessage = error.response && error.response.data ? error.response.data.message : '주문 처리 중 오류가 발생했습니다.';
+                         alert(errorMessage);
+                     }
+                 } ) // end catch()
 
 
    }

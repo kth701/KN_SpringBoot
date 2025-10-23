@@ -83,6 +83,7 @@ public class CartController {
     // ------------------------------------------------------------------------ //
     // REST API 방식 : PATCH (요청 자원의 일부만 처리)
     // ------------------------------------------------------------------------ //
+
     // 3. 장바구니 상품 수정
     @PatchMapping(value="/cartItem/{cartItemId}")
     public @ResponseBody ResponseEntity updateCartItem(
@@ -147,16 +148,22 @@ public class CartController {
             return new ResponseEntity<String>("주문할 상품을 선택해주세요", HttpStatus.FORBIDDEN);
         }
 
+        String email = "user1@test.com"; // Security 로그인 미적용시 테스트용
         for (CartOrderDTO cartOrder : cartOrderDTOList ){
-            //if (!cartService.validateCartItem(cartOrder.getCartItemId(), "test@email.com")){
-            if (!cartService.validateCartItem(cartOrder.getCartItemId(), principal.getName())){
+            // Security 로그인 미적용 : 테스트용 로그인 상태
+            if (!cartService.validateCartItem(cartOrder.getCartItemId(), email)){
+            // Security 로그인 시 적용
+            //if (!cartService.validateCartItem(cartOrder.getCartItemId(), principal.getName())){
                 return new ResponseEntity("주문 권한이 없습니다.",HttpStatus.FORBIDDEN);
             }
         }// end for
 
         // 장바구니 상품 주문 서비스 요청하기
-        Long orderId = cartService.orderCartItem(cartOrderDTOList, principal.getName());
-        //Long orderId = cartService.orderCartItem(cartOrderDTOList, "test@email.com");
+        // Security 로그인 미적용 : 테스트용 로그인 상태
+        Long orderId = cartService.orderCartItem(cartOrderDTOList, email);
+        // Security 로그인시 적용
+        //Long orderId = cartService.orderCartItem(cartOrderDTOList, principal.getName());
+
 
         return new ResponseEntity<Long>(orderId, HttpStatus.OK);
     }

@@ -155,7 +155,7 @@ public class OrderService {
     // OrderDTO: 주문할 상품아이디, 수량 정보 담아 놓는 DTO
     public Long orders(List<OrderDTO> orderDTOList, String email){
 
-
+        // 현재 로그인 회원 정보 추출
         Member member = memberRepository.findByEmail(email);
         List<OrderItem> orderItemList = new ArrayList<>();
 
@@ -163,7 +163,7 @@ public class OrderService {
             //log.info("------");
             log.info("=> CartOrderDTO OrderService:"+orderDTO);
 
-            // 5.1 orderDTO : 주문상품아이디, 수량
+            // 5.1 orderDTO : 주문상품아이디로 상품 정보 추출
             Item item = itemRepository.findById(orderDTO.getItemId()).orElseThrow(EntityNotFoundException::new);
 
             // 5.2 orderDTO 값을 통해 OrderItem Entity 객체 생성
@@ -172,7 +172,8 @@ public class OrderService {
             orderItemList.add(orderItem);
         }
 
-        // 5.3 주문상품(OrderItem) Entity와 주문(Order) Entity 연관 맵핑
+        // 5.3 주문서 생성 : 주문자(로그인한 회원), 주문상품 List
+        // => 주문상품(OrderItem) Entity와 주문(Order) Entity 연관 맵핑
         Order order = Order.createOrder(member, orderItemList);
         // 5.4 생성된 Order Entity DB반영
         orderRepository.save(order);

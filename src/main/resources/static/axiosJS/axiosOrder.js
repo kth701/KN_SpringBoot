@@ -86,4 +86,9 @@ async function cartItem(cartItemData){
         [_csrf_header]: _csrf                               // 토큰 전송
     }})
 
+
+
+       //           => { "cartOrderDTOList":
+       //                       [{"cartItemId": cartItemId1},{"cartItemId": cartItemId2},...]
+       //                 } 형식으로 List구조 문자열 서버에 전달됨
 */

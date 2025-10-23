@@ -142,7 +142,7 @@ public class CartService {
 
 
     // -------------------------------------------------------------------- //
-    // 6. 장바구니 상품 주문하기
+    // 6. 장바구니 상품 주문하기: CartItem -> OrderItem
     // -------------------------------------------------------------------- //
     public Long orderCartItem(List<CartOrderDTO> cartOrderDTOList, String email){
 
