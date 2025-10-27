@@ -1,20 +1,18 @@
 package com.example.mallapi.config;
 
-import com.example.mallapi.mall.security.filter.JWTCheckFilter;
+import com.example.mallapi.mall.security.CustomUserDetailService;
 import com.example.mallapi.mall.security.handler.APILoginFailHandler;
 import com.example.mallapi.mall.security.handler.APILoginSuccessHandler;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,18 +30,23 @@ public class CustomSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // Security 로그인시 :  스프링 시큐리티 정보(principal.username,...) 와 DB정보 연동
+    //  => DB의 정보를 가져와 스프링 시큐리티 세션 정보로 사용하는 것이 목적
+    @Autowired
+    CustomUserDetailService customUserDetailService;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("--- security configure : SecurityFilterChain ---");
 
-        /* JWT처리
+        /* JWT처리관련 설정
         // CORS 설정
         http.cors(httpSecurityCorsConfigurer ->
                 httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource())
         );
 
 
-        // 세션 STATELESS 설정(무세션)
+        // 세션 STATELESS 설정(무세션) => RestFul API 방식일 경우 적용
         http.sessionManagement(sessionConfig ->
                 sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         */
@@ -82,6 +85,7 @@ public class CustomSecurityConfig {
         return http.build();
     }
 
+    // JWT 및 RestFul API적용시 다른 도메인관련된 설정
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 

@@ -66,6 +66,9 @@ dependencies {
 	// spring security thymeleaf
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
+	// OAuth2 Client
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
 	
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	// Lombok  설정

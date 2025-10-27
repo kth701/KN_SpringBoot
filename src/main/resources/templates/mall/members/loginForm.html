@@ -1,0 +1,23 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/.thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content">
+
+    <!-- Axios & Custom JS -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script th:src="@{/axiosJS/axiosOrder.js}"></script>
+</div>
+
+<!-- 현재 페이지에서만 사용하는 CSS정의 -->
+<style layout:fragment="mystyle" th:inline="css">
+</style>
+
+<!-- 현재 페이지에서만 사용하는 javasscript 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+
+</script>
+
+</html>

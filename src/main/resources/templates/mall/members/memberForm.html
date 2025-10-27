@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+
+    <div layout:fragment="content">
+        <div class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+            <div class="bg-white p-8 md:p-12 rounded-lg border border-gray-200">
+                <h1 class="text-2xl font-bold text-gray-900 mb-8">회원가입</h1>
+
+                <form th:object="${memberFormDTO}" method="post">
+                    <!-- email -->
+                    <div class="mt-6">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">이메일 (로그인 ID)</label>
+                        <input type="email" id="email" th:field="*{email}" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="이메일 주소를 입력하세요.">
+                        <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-xs text-red-500 mt-1"></p>
+                        <p th:if="${errorMessage}" th:text="${errorMessage}"  class="text-xs text-red-500 mt-1"></p><!--회원 중복 가입 메시지-->
+                    </div>
+
+                    <!-- password -->
+                    <div class="mt-6">
+                        <label for="pw" class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
+                        <input type="password" id="pw" th:field="*{pw}" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="비밀번호를 입력하세요.">
+                        <p th:if="${#fields.hasErrors('pw')}" th:errors="*{pw}" class="text-xs text-red-500 mt-1"></p>
+                    </div>
+
+                    <!-- nickname -->
+                    <div class="mt-6">
+                        <label for="nickname" class="block text-sm font-medium text-gray-700 mb-2">닉네임</label>
+                        <input type="text" id="nickname" th:field="*{nickname}" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="사용할 닉네임을 입력하세요.">
+                        <p th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="text-xs text-red-500 mt-1"></p>
+                    </div>
+
+                    <!-- hidden fields
+                    <input type="hidden" th:field="*{social}" />
+                    <input type="hidden" th:field="*{del}" />
+                    <div th:each="roleName, stat : *{roleNames}">
+                        <input type="hidden" th:name="|roleNames[${stat.index}]|" th:value="${roleName}" />
+                    </div> -->
+
+                    <!-- Action Buttons -->
+                    <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end">
+                        <button  th:formaction="@{/members/new}" type="submit" class="rounded-md bg-gray-800 py-2 px-6 text-sm font-semibold text-white shadow-sm hover:bg-gray-700">회원가입</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 현재 페이지에서만 사용하는 CSS정의 -->
+    <style layout:fragment="mystyle"  th:inline="css">
+        .filedError {
+          color: red;
+          font-size: 0.8em;
+
+
+          padding: 0.2em;
+          padding-left:1em; padding-right: 1em;
+        }
+    </style>
+
+    <!-- 현재 페이지에서만 사용하는 javasscript 정의 -->
+    <script layout:fragment="myscript" th:inline="javascript">
+
+        // 서버로 부터 회원 가입 중복 메시지가 있으면 처리
+        const errorMessage = [[${errorMessage}]]
+        const emailCheck = document.querySelector('#email');
+
+        // 이메일 중복시 서버에 보낸 에러메시지 처리
+        if (errorMessage){
+          emailCheck.innerHTML = errorMessage;
+          console.log("errorMessage:"+errorMessage)
+        }
+
+    </script>
+
+</html>

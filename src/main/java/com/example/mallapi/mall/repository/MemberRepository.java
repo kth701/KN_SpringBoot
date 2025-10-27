@@ -17,7 +17,7 @@ public interface MemberRepository extends JpaRepository<Member, String> {
     @Query("select m from Member m where m.email = :email ")
     Member getWithRoles(@Param("email") String email);
 
-    // 주문서, 장바구니에 적용
+    // 주문서, 장바구니에서 Security로그인한 username(email)로 회원정보 추출하는 메서드
     Member findByEmail(String email); // 이메일로 회원 조회
 }
 

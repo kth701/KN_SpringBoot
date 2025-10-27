@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import java.util.stream.Collectors;
 
 /*
-security에서 사용자의 인증 처리하기 위한 인터페이스의 구현
+Security에서 사용자의 인증 처리하기 위한 인터페이스의 구현
+Security 로그인시 :  스프링 시큐리티 정보(principal.username,...) 와 DB정보 연동
+=> DB의 정보를 가져와 스프링 시큐리티 세션 정보로 사용하는 것이 목적
  */
 @Service
 @Log4j2
