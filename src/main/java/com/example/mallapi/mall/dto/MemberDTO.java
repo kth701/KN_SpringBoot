@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 /*
 주의: 입력폼 MemberFormDTO와 MemberDTO구분됨
 MemberFormDTO: 클라이언트로 부터 회원 가입 정보 전달용
-MemberDTO  Security로그인 처리를 위한 User객체 상속받아 처리하는 DT
+
+User클래스로 부터 상속받아 MemberDTD에서 User객체 생성
  */
 @Getter@Setter@ToString
 //public class MemberDTO extends User  implements OAuth2User { // 1-1. 소셜 로그인 경우
 public class MemberDTO extends User {
-    // 주의: CustomSecurityConfig클래스에서 주입에서 주입해야함.
     // MemberDTO클래스 생성된 객체는 User객체임을 의미
     // User객체: DB의 정보를 가져와 스프링 시큐리티 세션 정보로 사용하는 것이 목적
 
@@ -46,7 +46,7 @@ public class MemberDTO extends User {
                             List<String> roleNames
                                      ) {
         // Spring Security의 User 클래스 생성자 호출
-        // User객체 스프링 시큐리티에서 사용한 세선정보 객체
+        // User객체는 스프링 시큐리티에서 사용하는  세션 정보 객체는 User생성자를 통해 데이터를 전달받아 세션정보객체 생성
         super(// User(부모객체) 생성자를 통해서 username(email), password, 권한설정값 을 초기화
                 username,
                 password,
