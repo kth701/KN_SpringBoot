@@ -107,7 +107,7 @@ public class CustomUserDetailService implements UserDetailsService {
         return memberDTO;
 
 
-        /*
+        /* MemberDTO클래스에서 User클래스를 상속받지 않고 User클래스 객체 생성자로 통해 UserDetails객체를 생성하기
         // User객체는 스프링 시큐리티에서 사용하는  세선 정보 객체로 생성자를 통해 데이터를 전달받음=>MemberDTO클래스에서 직접 구현
         return User.builder()
                     .username(member.getEmail())

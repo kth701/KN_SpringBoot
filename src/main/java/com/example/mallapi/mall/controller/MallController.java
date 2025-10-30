@@ -3,7 +3,6 @@ package com.example.mallapi.mall.controller;
 import com.example.mallapi.mall.dto.MainItemDTO;
 import com.example.mallapi.mall.dto.search.ItemSearchDTO;
 import com.example.mallapi.mall.service.ItemService;
-import com.example.mallapi.todo.dto.PageRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -43,43 +42,12 @@ public class MallController {
 
         //model객체 유지한체로 thymeleafEx/ex01.html로 이동
         //return "template_webpage/mallmain";
-        return "template_webpage/mainbase";
+        return "mall/mainbase";
     }
 
 
 
 
 
-    // mall UI Test
-
-    @GetMapping("/mallsub")
-    public String mallsub(Model model) {
-        model.addAttribute("message", "TodoController에서 보낸 메시지입니다.");
-
-        //model객체 유지한체로 thymeleafEx/ex01.html로 이동
-        return "template_webpage/mallsub";
-    }
-    // ------------------------------------------------------------------------ //
-
-    @GetMapping("/mall/main")
-    public String mainpage(Model model) {
-        model.addAttribute("message", "TodoController에서 보낸 메시지입니다.");
-
-        //model객체 유지한체로 thymeleafEx/ex01.html로 이동
-        return "template_webpage/main";
-    }
-
-    // Todo List
-    @GetMapping("/mall/list")
-    public String list(PageRequestDTO pageReqeustDTO, Model model) {
-
-//        PageResponseDTO<TodoDTO> pageResponseDTO
-//                = todoService.getTodoList(pageReqeustDTO);
-//
-//        model.addAttribute("todoDTOList", pageResponseDTO.getDtoList());
-//        model.addAttribute("pageResponseDTO", pageResponseDTO);
-
-        return "todo/list"; // resources/templates/todo/list.html
-    }
 
 }

@@ -13,15 +13,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /*
-주의: 입력폼 MemberFormDTO와 MemberDTO구분됨
-MemberFormDTO: 클라이언트로 부터 회원 가입 정보 전달용
+    주의: 입력폼 MemberFormDTO와 MemberDTO구분됨
 
-User클래스로 부터 상속받아 MemberDTD에서 User객체 생성
+    MemberFormDTO: 클라이언트로 부터 회원 가입 정보 전달용
+    User클래스로 부터 상속받아 MemberDTD에서 User객체 생성
  */
 @Getter@Setter@ToString
 //public class MemberDTO extends User  implements OAuth2User { // 1-1. 소셜 로그인 경우
 public class MemberDTO extends User {
-    // MemberDTO클래스 생성된 객체는 User객체임을 의미
+    // User클래스로 부터 상속받아 MemberDTD에서 User객체 생성하여 UserDetails객체 반환
     // User객체: DB의 정보를 가져와 스프링 시큐리티 세션 정보로 사용하는 것이 목적
 
     private String email;
@@ -110,3 +110,16 @@ public class MemberDTO extends User {
     */
 
 }
+
+/*
+
+    스프링 시큐리터를 이용하여 로그인/로그아웃 기능 구현
+
+        - 스프링 시큐리티 정보(principal.username,...) 와 DB정보 연동
+        - UserDetailService 인터페이스 : 데이터베이스에서 회원 정보를 가져오는 역할
+        - loadUserByuUsername()메소드 통해, 회원 정보를 조회하여 사용자의 정보와 권한을 갖는 UserDetails인터페이스를 반환
+        - User클래스는 UserDetails인터페이스를 구현하고 있는 클래스
+
+        => DB의 정보를 가져와 스프링 시큐리티 세션 정보로 사용하는 것이 목적
+
+ */

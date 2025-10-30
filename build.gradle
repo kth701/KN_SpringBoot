@@ -10,15 +10,9 @@ description = 'Demo project for Spring Boot'
 
 // Java 버전 설정 (Toolchain을 사용하여 JDK 20으로 설정)
 java {
-    // toolchain {
-    //     languageVersion = JavaLanguageVersion.of(20)
-    // }
-    // sourceCompatibility와 targetCompatibility는 toolchain에 의해 설정될 수 있지만,
-    // 명시적으로 설정하여 호환성을 보장하는 것이 좋습니다.
     sourceCompatibility = JavaVersion.VERSION_20
     targetCompatibility = JavaVersion.VERSION_20
 }
-
 
 configurations {
 	compileOnly {
@@ -77,7 +71,9 @@ dependencies {
 
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.junit.platform:junit-platform-launcher'
+    // testRuntimeOnly 'org.junit.platform:junit-platform-launcher' 제거
+    //  testImplementation이나 runtimeOnly 등 더 표준화된 구성을 사용하도록 권장
 
 // Lombok 테스트용 설정(TEST코드에 사용할 수 있게 포함)
 	testCompileOnly 'org.projectlombok:lombok'

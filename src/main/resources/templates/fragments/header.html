@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     
 <!-- Header -->
 <div th:fragment="navbar">
     <header class="bg-white shadow-md sticky top-0 z-50">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-3xl font-bold text-gray-900">ModernShop</a>
-            <div class="hidden md:flex items-center space-x-6">
-                <a href="/thymeleafEx/main" class="text-gray-600 hover:text-gray-900">Home</a>
-                <a href="/thymeleafEx/mainsub" class="text-gray-900 font-bold">Shop</a>
-                <a href="#" class="text-gray-600 hover:text-gray-900">About</a>
-                <a href="#" class="text-gray-600 hover:text-gray-900">Contact</a>
-            </div>
-            <div class="flex items-center space-x-4">
-                <a href="#" class="text-gray-600 hover:text-gray-900">Login</a>
+                <a href="#" class="text-3xl font-bold text-gray-900">ModernShop</a>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="/"  th:href="@{/}" class="text-gray-600 hover:text-gray-900">Home</a>
+                    <a href="/admin/item/new"  th:href="@{/admin/item/new}" sec:authorize="hasAnyAuthority('ROLE_ADMIN')"
+                         class="text-gray-900 font-bold">상품등록</a>
+                    <a href="#"   th:href="@{/admin/item/new}" sec:authorize="hasAnyAuthority('ROLE_ADMIN')"
+                        class="text-gray-600 hover:text-gray-900">상품관리</a>
+                    <a href="#" class="text-gray-600 hover:text-gray-900">장바구니</a>
+                    <a href="#" class="text-gray-600 hover:text-gray-900">구매이력</a>
+                    <div class="flex items-center space-x-4">
+                </div>
+                <a href="/members/login" class="text-gray-600 hover:text-gray-900">Login</a>
                 <a href="#" class="bg-gray-900 text-white px-4 py-2 rounded-full hover:bg-gray-800">Sign Up</a>
             </div>
         </nav>

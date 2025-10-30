@@ -1,5 +1,7 @@
 package com.example.mallapi.config;
 
+import com.example.mallapi.mall.exception.Custom403Handler;
+import com.example.mallapi.mall.exception.CustomAuthenticationEntryPoint;
 import com.example.mallapi.mall.security.CustomUserDetailService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +19,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
@@ -94,7 +98,7 @@ public class CustomSecurityConfig {
         // 2. Security Login Form 설정하기
         // Security 로그인 폼 설정은 POST방식 적용됨:  username, password파리미터를 통해 로그인처리
         http.formLogin(login -> {
-            login.loginPage("/members/login")             // 로그인폼 처리할 URL
+            login.loginPage("/members/login")             // 로그인폼 처리할 URL( Security 기본 로그인으로 설정된 '/login' url 대신 적용됨)
                     .usernameParameter("email")             // 로그인 폼에서 전달 받은 email 매개변수값을   username으로 설정하여 세션 정보(User)객체와 비교
                     .passwordParameter("password")       // 로그인 폼에서 전달 받은 password 매개변수값을  password으로 설정하여 세션 정보(User)객체와 비교
 //                    .defaultSuccessUrl("/") // 중복될 경우 defaultSuccessUrl()우선으로 처리됨
@@ -131,7 +135,7 @@ public class CustomSecurityConfig {
         //    Security 기본 로그아웃 URL => url : "/logout" 로그아웃수행됨
         // ---------------------------------------------------------------- //
 
-        // Security 기본 로그아웃
+        // Security 기본 로그아웃 설정
         http.logout(Customizer.withDefaults());
 
         /*
@@ -145,31 +149,53 @@ public class CustomSecurityConfig {
          */
 
 
-        // 요청 경로별 인가 설정: 리소스 접근에 대한 설정을 하지 않으면 ->  로그인 정상 처리후 누구나 접근 가능하도록 설정됨.
+        // 요청 경로별 인가 설정: 리소스 접근에 대한 설정을 하지 않으면
+        //  (http.authorizeHttpRequests()메서드 구현하지않을 경우) ->  로그인 정상 처리후 누구나 접근 가능하도록 설정됨.
         // 로그인 성공시: 인증과정 및 리소스 접근 권한 설정하기
-//        http.authorizeHttpRequests(auth -> {
-            // JWT:  로그인 및 토큰 재발급 경로는 모두에게 허용
-            //authorize.requestMatchers("/api/member/login", "/api/member/refresh","/api/member/kakao").permitAll();
+        http.authorizeHttpRequests(auth -> {
+            //JWT:  로그인 및 토큰 재발급 경로는 모두에게 허용
+            auth.requestMatchers("/api/member/login", "/api/member/refresh","/api/member/kakao").permitAll();
 
             // 1. 정적리소스 접근 권한  부여
-//            auth.requestMatchers("/axiosJS/**","/css/**","/js/**","/images/**").permitAll();
-            // 2. 특정 리소스 접근 권한 부여
-//            auth.requestMatchers("/","/members/**","/admin/**","/cart/**","/orders/**","/board/**").permitAll();// 테스트용
+            auth.requestMatchers("/axiosJS/**","/css/**","/js/**","/images/**").permitAll();
+            // 2. 특정 리소스 접근 권한 부여 : 테스트용 경로 permitAll()에 적용 ,"/admin/**","/cart/**","/orders/**","/board/**"
+            auth.requestMatchers("/","/members/**").permitAll();
             // 3. 특정 권한 설정에 따른 리소스 접근
-//            auth.requestMatchers("/cart/**","/orders/**").hasRole("USER");
-//            auth.requestMatchers("/admin/**").hasRole("ADMIN");
+            auth.requestMatchers("/cart/**","/orders/**").hasRole("USER");
+            auth.requestMatchers("/admin/**").hasRole("ADMIN");
 
             // 4. 위에서 설정해준 리소스를 제외한 나머지는 무조건 인증절차를 요구하도록 설정
-            //auth.anyRequest().authenticated();
+            auth.anyRequest().authenticated();
+            //auth.anyRequest().permitAll(); // 테스트용: 인증 절차 없이 리소스 접근 가능
 
-            // 인증 절차 없이 리소스 접근 가능
-//            auth.anyRequest().permitAll();
+        });
 
-//        });
-
+        // 인증되지 않은 사용자가 리소스요청할 경우 예외 처리 하지 않으면 -> '페이지가 작동하지 않습니다.' 에러 페이지 표시됨
+        http.exceptionHandling(configurer -> {
+            //configurer.authenticationEntryPoint(authenticationEntryPoint());// 예처리 방법1 -> 단순 예외처리 메시지전달
+            configurer.accessDeniedHandler(accessDeniedHandler());// 예외처리 방법2 -> 예외발생시 로그인 페이지로 이동
+            /*
+            accessDeniedHandler()메서드 우선을 작동됨.
+            configurer.authenticationEntryPoint(authenticationEntryPoint());// 1. 아래 빈으로 등록후 사용
+            configurer.authenticationEntryPoint(new CustomAuthenticationEntryPoint());// 2. 직접 객체 빈 객체 생성
+             */
+        });
 
         return http.build();
     }
+
+    // --------------------------------------------------------------------------------- //
+    //  접근 권한에 맞지 않은 요청시 403에러 핸들러  객체 생성하여 처리 설정: 2가지 타입
+    // --------------------------------------------------------------------------------- //
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint(){
+        return new CustomAuthenticationEntryPoint();
+    }
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler(){
+        return new Custom403Handler();
+    }
+    // --------------------------------------------------------------------------------- //
 
 
 
