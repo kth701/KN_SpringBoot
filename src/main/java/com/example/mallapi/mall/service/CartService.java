@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -86,11 +85,11 @@ public class CartService {
         Member member = memberRepository.findByEmail(email);
         Cart cart = cartRepository.findByMemberEmail(member.getEmail());// 장바구니와 회원아이디 맵핑관계
 
-        // 2.2 장바구니 엔티티가 없으면 비어 있는 List반환
-        if (cart == null){
-            return cartDetailDTOList = cartItemRepository.findCartDetailDtoList(cart.getId());
+        // 2.2 장바구니 엔티티가 없으면 -> 비어 있는 List반환
+        if (cart == null){      
+            return cartDetailDTOList;
         }
-
+    
         // 2.3 장바구니에 담은 상품 조회
         cartDetailDTOList = cartItemRepository.findCartDetailDtoList(cart.getId());
 
@@ -185,4 +184,3 @@ public class CartService {
     }
 
 }
-

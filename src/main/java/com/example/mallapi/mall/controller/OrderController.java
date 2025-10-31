@@ -35,21 +35,21 @@ public class OrderController {
     // @ResponseBody: 자바 객체를 Http요청의 body로 전달
 
     // 1. 상품 주문하기
-    @PostMapping(value="/order")
+    @PostMapping(value = "/order")
     public @ResponseBody ResponseEntity order(
             Principal principal,
             @RequestBody @Valid OrderDTO orderDTO,
-            BindingResult bindingResult   ){
+            BindingResult bindingResult) {
 
         log.info("=> 상품주문 서비스 컨트롤러");
 
         // 유효성 검사: 주문 정보를 받는 orderDTO객체에 데이터 바인딩 시 에러가 있는지 검사
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             StringBuffer sb = new StringBuffer();
 
             // 유효성 검사시 에러가 발생한 필드만 추출
             List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-            for (FieldError fieldError : fieldErrors){
+            for (FieldError fieldError : fieldErrors) {
                 sb.append(fieldError.getDefaultMessage());
             }
             // 필드(속성) 에러가 있을 경우 상태코드와 에러 메시지를 클라이언트에 전달
@@ -57,15 +57,20 @@ public class OrderController {
         }
 
         // principal객체서 현재 로그인한 이메일 정보 얻기: 시큐리티 로그인한 username => 아이디(이메일)
-        //String email = principal.getName();
-        String email = "user1@test.com"; // 테스트용으로 직접 입력: member테이블에 있는 데이터 사용
+        String email = "";
+        if (principal == null)
+            // Security 로그인 미 적용시 테스트용 ->  로그인 한 회원 이메일 정보 // 테스트용
+            email = "user1@test.com";
+        else
+            // Security 로그인 한 회원 이메일 정보
+            email = principal.getName();
 
         // 주문서가 정상 처리되었을때 생성된 주문서 ID(order_id
         Long orderId;
         try {
             // 상품상세페이지에서 주문한 정보(화면)로 부터 넘어온 주문정보와 회원의 이메일 정보를 이용하여 주문 로직 서비스 호출
             orderId = orderService.order(orderDTO, email);
-        } catch (Exception e){
+        } catch (Exception e) {
             // 주문 서비스 요청시 예외가 발생했을 경우 : 에러메시지 문자열와 상태코드를 클라이언에 전달
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -75,21 +80,27 @@ public class OrderController {
     }
 
     // 2. 회원(고객) 구매(주문) 이력 조회
-    @GetMapping(value={"/orders", "/orders/{page}"})
+    @GetMapping(value = {"/orders", "/orders/{page}"})
     public String orderHist(
             Principal principal,
-            @PathVariable("page")Optional<Integer> page,
+            @PathVariable("page") Optional<Integer> page,
             Model model
-    ){
+    ) {
         // 페이지 설정: 한 번에 가지고 올 주문서 개수 및 시작 페이지 인덱스 번호
-        Pageable pageable = PageRequest.of(page.isPresent()?page.get(): 0, 2);
+        Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, 2);
 
-        // 현재 로그인 한 회원의 이메일과 페이징 객체를 인자로 전달하여 구매이력 조회
+
+        String email = "";
+        if (principal == null)
+            // Security 로그인 미 적용시 테스트용 ->  로그인 한 회원 이메일 정보 // 테스트
+            email = "user1@test.com"; // 테스트용으로 직접 입력: member테이블에 있는 데이터 사용
+        else
+            // Security 로그인 한 회원 이메일 정보
+            email = principal.getName();
+
+        // 현재 로그인 한 회원의 이메일과 페이징 객체를 인자로 전달하여 구매이력 조회ㄴ
         Page<OrderHistDTO> orderHistDTOSList =
-                //orderService.getOrderList(principal.getName(), pageable); // Security 로그인  적용시 주석 제거
-
-        // Security 로그인 미 적용시 테스트용 로그인 한 회원 이메일 정보
-        orderService.getOrderList("user1@test.com", pageable); // 테스트
+                orderService.getOrderList(email, pageable);
 
 
         model.addAttribute("orders", orderHistDTOSList);
@@ -97,22 +108,22 @@ public class OrderController {
         model.addAttribute("maxPage", 5); // 페이지 블럭 (한화면에 보여질 페이지 개수)
 
         log.info("==> 구매이력: OrderController");
-        orderHistDTOSList.getContent().forEach( o -> log.info(o));
+        orderHistDTOSList.getContent().forEach(o -> log.info(o));
         return "mall/order/orderHist";
     }
 
     // 3. 주문 취소 처리
-    @PostMapping(value="/order/{orderId}/cancel")
+    @PostMapping(value = "/order/{orderId}/cancel")
     public @ResponseBody ResponseEntity cancelOrder(
             Principal principal, // Security 로그인시 email(username)
-            @PathVariable("orderId") Long orderId ){
+            @PathVariable("orderId") Long orderId) {
 
         // Security 로그인 미적용시 테스트용 username, Security 로그인 적용시 주석 처리
         String email = "user1@test.com";// Security 로그인 미적용시 테스트용 username
 
         // 주문 취소시 현재 취소한 사용자(로그인)가 주문자인지 권한 검사
-       // if (!orderService.validateOrder(orderId, principal.getName())){
-        if (!orderService.validateOrder(orderId, email)){
+        // if (!orderService.validateOrder(orderId, principal.getName())){
+        if (!orderService.validateOrder(orderId, email)) {
             return new ResponseEntity("주문 취소 권한이 없습니다.", HttpStatus.FORBIDDEN);
         }
 

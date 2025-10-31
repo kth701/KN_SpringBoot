@@ -46,10 +46,17 @@ public class CartController {
         }
 
         // 1.2 현재 로그인한 회원의 이메일(아이디)정보를 추출
-        String email = "user1@test.com";
-//        String email = principal.getName();
-        Long cartItemId;
+        // principal객체서 현재 로그인한 이메일 정보 얻기: 시큐리티 로그인한 username => 아이디(이메일)
+        String email="";
+        if (principal == null)
+            // Security 로그인 미 적용시 테스트용 ->  로그인 한 회원 이메일 정보 // 테스트용
+            email = "user1@test.com";
+        else
+            // Security 로그인 한 회원 이메일 정보
+            email = principal.getName();
 
+
+        Long cartItemId;
         try {
             // Cart, cartItem 객체 생성(장바구니, 장바구니상품)
             cartItemId = cartService.addCart(cartItemDTO, email);
@@ -68,8 +75,14 @@ public class CartController {
             Principal principal, // Security 로그인 회원 정보 추출: username(email)
             Model model){
 
-        String email = "user1@test.com";// test용 => Security 로그인 적용시 주석 처리
-        //String email = principal.getName();
+        // principal객체서 현재 로그인한 이메일 정보 얻기: 시큐리티 로그인한 username => 아이디(이메일)
+        String email="";
+        if (principal == null)
+            // Security 로그인 미 적용시 테스트용 ->  로그인 한 회원 이메일 정보 // 테스트용
+            email = "user1@test.com";
+        else
+            // Security 로그인 한 회원 이메일 정보
+            email = principal.getName();
 
         // 현재 로그인한 회원의 장바구니 상품 조회
         List<CartDetailDTO> cartDetailDTOList = cartService.getCartList(email);
@@ -93,8 +106,14 @@ public class CartController {
     ){
         log.info("==> 주문상품:"+cartItemId+","+count);
 
-        //String email = principal.getName();
-        String email = "user1@test.com"; // test
+        // principal객체서 현재 로그인한 이메일 정보 얻기: 시큐리티 로그인한 username => 아이디(이메일)
+        String email="";
+        if (principal == null)
+            // Security 로그인 미 적용시 테스트용 ->  로그인 한 회원 이메일 정보 // 테스트용
+            email = "user1@test.com";
+        else
+            // Security 로그인 한 회원 이메일 정보
+            email = principal.getName();
 
         if (count <= 0 ){
             // 장바구니 상품 개수가 0이하면 에러메시지와 상태코드 반환
@@ -120,8 +139,15 @@ public class CartController {
     ){
 
         // 4.1 로그인한 회원의 장바구니인지 판별
-        //String email = principal.getName();
-        String email = "user1@test.com"; // test
+        // principal객체서 현재 로그인한 이메일 정보 얻기: 시큐리티 로그인한 username => 아이디(이메일)
+        String email="";
+        if (principal == null)
+            // Security 로그인 미 적용시 테스트용 ->  로그인 한 회원 이메일 정보 // 테스트용
+            email = "user1@test.com";
+        else
+            // Security 로그인 한 회원 이메일 정보
+            email = principal.getName();
+
         if(!cartService.validateCartItem(cartItemId, email)){
             return new ResponseEntity<String>("삭제 권한이 없습니다. ", HttpStatus.FORBIDDEN);
         }
@@ -148,7 +174,15 @@ public class CartController {
             return new ResponseEntity<String>("주문할 상품을 선택해주세요", HttpStatus.FORBIDDEN);
         }
 
-        String email = "user1@test.com"; // Security 로그인 미적용시 테스트용
+        // principal객체서 현재 로그인한 이메일 정보 얻기: 시큐리티 로그인한 username => 아이디(이메일)
+        String email="";
+        if (principal == null)
+            // Security 로그인 미 적용시 테스트용 ->  로그인 한 회원 이메일 정보 // 테스트용
+            email = "user1@test.com";
+        else
+            // Security 로그인 한 회원 이메일 정보
+            email = principal.getName();
+
         for (CartOrderDTO cartOrder : cartOrderDTOList ){
             // Security 로그인 미적용 : 테스트용 로그인 상태
             if (!cartService.validateCartItem(cartOrder.getCartItemId(), email)){
