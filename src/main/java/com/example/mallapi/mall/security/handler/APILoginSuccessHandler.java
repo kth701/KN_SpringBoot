@@ -25,14 +25,21 @@ public class APILoginSuccessHandler implements AuthenticationSuccessHandler {
         log.info("=>3. authentication.getAuthorities(): {}",authentication.getAuthorities());
         log.info("=>4. authentication.getPrincipal(): {}",authentication.getPrincipal());
         log.info("---------------");
-        log.info("--> (MemberDTO) authentication.getPrincipal(): {}",(MemberDTO) authentication.getPrincipal());
+        MemberDTO memberDTO = (MemberDTO)authentication.getPrincipal();
+        log.info("-> MemberDTO memberDTO = (MemberDTO)authentication.getPrincipal()");
+        log.info("->5.  memberDTO.getNickname(): "+memberDTO.getNickname());
+        log.info( "->6.  ((MemberDTO)authentication.getPrincipal()).getNickname(): "+((MemberDTO)authentication.getPrincipal()).getNickname());
         log.info("---------------");
 
+        // 서버 페이지에 로그인 성공시 메시지 전달하기 처리하고, json형식 에러 메시지 데이터 클라이언트에게 보내기
+        // -> 정상 작동 ,. jwt 정상 처리한 후  test필요)
 
-        // 로그인 성공 -> JWT발급 ->클라이언트에 보내기
-        MemberDTO memberDTO = (MemberDTO) authentication.getPrincipal();
-        log.info("=>5. memberSecurityDTO.getNickname(): {}",memberDTO.getNickname());
+        // 로그인 성공후 후처리 작업한 뒤 마지막 보여질 View
+        response.sendRedirect("/");
 
+        // ------------------------------------------------------------------------------------- //
+        // 로그인 성공시 JWT 발급하기  ->클라이언트에 보내기
+        // ------------------------------------------------------------------------------------- //
         Map<String, Object> claims = memberDTO.getClaims();
         // JWT 발급
         String accessToken = JWTUtil.generateToken(claims, 10);
@@ -51,8 +58,11 @@ public class APILoginSuccessHandler implements AuthenticationSuccessHandler {
         response.getWriter().flush();
         response.getWriter().close();
 
-        // 로그인 성공후 후처리 작업한 뒤 마지막 보여질 View
-        response.sendRedirect("/");
+        log.info("---------- 로그인 성공시 JWT 발급하기  ->클라이언트에 보내기--------------");
+        log.info("---------- JWT :API LoginSuccessHandler : json message -> {}", json);
+        // ------------------------------------------------------------------------------------- //
+
+
 
 
     }

@@ -2,6 +2,7 @@ package com.example.mallapi.mall.service;
 
 import com.example.mallapi.mall.domain.Member;
 import com.example.mallapi.mall.dto.MemberDTO;
+import com.example.mallapi.mall.dto.MemberFormDTO;
 import com.example.mallapi.mall.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -13,31 +14,54 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 @Log4j2
-public class MemberServiceImpl implements MemberService { // 방법1.
-//public class MemberServiceImpl implements MemberService, UserDetailsService { // 방법2.
+// 방법1.  User클래스상속받은 MemberDTO클래스에서 구현
+public class MemberServiceImpl implements MemberService {
+// 방법2. MemberServiceImpl클래스에서 User객체를 구현하는 UserDetailsService인터페이스를  직접 작성
+// -> User클래스 생성자를 통해 UserDetails객체 생성하여 반환하여 세션정보를 생성
+//public class MemberServiceImpl implements MemberService, UserDetailsService {
     /*
          security패키지 CustomUserDetailService클래스에서
-         UserDetailsService 인터페이스 구현한 관계로 여기서는 생략
          UserDetailsService구현 클래스는 CustomSecurityConfig클래스 멤버변수 객체 주입하는 방식으로 사용
      */
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+
     @Override
-    public Member saveMember(MemberDTO memberDTO) {
+//    public Member saveMember(MemberDTO memberDTO) {
+    public Member saveMember(MemberFormDTO memberFormDTO) {
         // 1.
         //Member member = Member.createMember(memberDTO);
 
         // 2.1
-        Member member = dtoToEntity(memberDTO, passwordEncoder);
+        MemberDTO memberDTO = memberFormToMemberDTO(memberFormDTO); // memberFormDTO -> MemberDTO(Security User DTO)
+        Member member = dtoToEntity(memberDTO, passwordEncoder);     // memberDTO -> Entity
 
         // 2.2 회원 중복 체크(email)기준
         validateDuplicatemember(member);
-        //Member findMember =  memberRepository.findByEmail(member.getEmail());
-        //if (findMember!=null) throw  new IllegalStateException("이미 가입된 회원입니다.");
+        /*  회원 중복 체크 함수(메서드)로 별로 정의하여 호출
+        Member findMember =  memberRepository.findByEmail(member.getEmail());
+        if (findMember!=null) throw  new IllegalStateException("이미 가입된 회원입니다.");
+         */
 
         // 2.3 중복된 이메일 없을 경우 저장(반영)
         return memberRepository.save(member);
     }
+
+    @Override
+    public MemberFormDTO findMember(String email) {
+        Member member = memberRepository.findByEmail(email);
+
+        MemberFormDTO memberFormDTO = new MemberFormDTO();
+
+        memberFormDTO.setEmail(member.getEmail());
+        //memberFormDTO.setPw(member.getPw()); // 새 비빌번호
+        //memberFormDTO.setCurrentPw(member.getPw()); // 현재 비밀번호
+        memberFormDTO.setSavedPw(member.getPw()); // 기존 비밀번호
+        memberFormDTO.setNickname(member.getNickname());
+
+        return memberFormDTO;
+    }
+
 
     // 회원 중복 체크(email)처리하는 메서드 정의
     // entity -> 이메일 유무체크
@@ -46,10 +70,18 @@ public class MemberServiceImpl implements MemberService { // 방법1.
         if (findMember!=null) throw  new IllegalStateException("이미 가입된 회원입니다.");
     }
 
+    // 회원 정보 수정 구현
+    @Override
+    public Member updateMember(MemberFormDTO memberFormDTO) {
 
-    // ------------------------------------------------------------------------------------- //
-    // Remember-me 기능 구현을 위해 UserDetailsService인터페이스을 구현하는 클래스를 작성
-    // ------------------------------------------------------------------------------------- //
+        MemberDTO memberDTO = memberFormToMemberDTO(memberFormDTO); // memberFormDTO -> MemberDTO(Security User DTO)
+        Member member = dtoToEntity(memberDTO, passwordEncoder);     // memberDTO -> Entity
+
+        return memberRepository.save(member);
+
+    }
+
+
 
 
 
@@ -60,10 +92,10 @@ public class MemberServiceImpl implements MemberService { // 방법1.
       --------------------------------------------------------------------------------
      */
 
-    //  2.  MemberServiceImpl클래스 에서 UserDetailsService인터페이스 구현 방식:
-    //  DB에서 회원정보를 가져오는와서 User객체 정보로 적용하는 역할
 
-    /*
+    /*  MemberServiceImpl클래스에서 UserDetailsService인터페이스 구현 방식:
+            -> DB에서 회원정보를 가져오는와서 User객체 정보로 적용하는 역할
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("=>로그인 아이디: "+username);
@@ -89,7 +121,6 @@ public class MemberServiceImpl implements MemberService { // 방법1.
                 .roles(member.getRole().toString())
                 .build();
         log.info("=>userDetails: "+userDetails.toString());
-
 
         return userDetails;
     }

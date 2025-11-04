@@ -38,6 +38,7 @@
 
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
+                        <!-- 자동 로그인 매개변수 설정: 생략시 "remember-me"로 설정됨. -->
                         <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                         <label for="remember-me" class="ml-2 block text-sm text-gray-900"> 자동 로그인 </label>
                     </div>
@@ -104,7 +105,12 @@
 </style>
 
 <script layout:fragment="myscript" th:inline="javascript">
-    console.log('loginForm javascript!!!')
+    const error = [[${error}]] // loginErrorMsg
+    console.log("error", error)
+    if (error=="ERROR_LOGIN") { // error객체 값이 있으면 처리
+        alert("아이디 또는 비밀번호를 확인해주세요");
+        // window.location.href="/members/login/error"
+    }
 </script>
 
 </html>

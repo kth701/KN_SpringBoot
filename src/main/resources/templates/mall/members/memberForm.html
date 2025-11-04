@@ -18,12 +18,30 @@
                         <p th:if="${errorMessage}" th:text="${errorMessage}"  class="text-xs text-red-500 mt-1"></p><!--회원 중복 가입 메시지-->
                     </div>
 
-                    <!-- password -->
+                    <!-- Current Password (only for member modification) -->
+                    <div class="mt-6" th:if="${memberFormDTO.email != null}">
+                        <label for="currentPw" class="block text-sm font-medium text-gray-700 mb-2">현재 비밀번호</label>
+                        <input type="password" id="currentPw" th:field="*{currentPw}"
+                               class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="현재 비밀번호를 입력하세요.">
+                        <p id="currentPwError" th:if="${#fields.hasErrors('currentPw')}" th:errors="*{currentPw}" class="text-xs text-red-500 mt-1"></p>
+                    </div>
+
+                    <!-- New Password -->
                     <div class="mt-6">
-                        <label for="pw" class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
-                        <input type="password" id="pw" th:field="*{pw}" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="비밀번호를 입력하세요.">
+                        <label for="pw"  th:text="${memberFormDTO.email != null} ? '새 비밀번호' : '비밀번호'" class="block text-sm font-medium text-gray-700 mb-2"></label>
+                        <input type="password" id="pw" th:field="*{pw}"
+                               class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" th:placeholder="${memberFormDTO.email != null} ? '새 비밀번호를 입력하세요.' : '비밀번호를 입력하세요.'">
                         <p th:if="${#fields.hasErrors('pw')}" th:errors="*{pw}" class="text-xs text-red-500 mt-1"></p>
                     </div>
+
+                    <!-- Confirm New Password (only for member modification) -->
+                    <div class="mt-6" th:if="${memberFormDTO.email != null}">
+                        <label for="confirmPw" class="block text-sm font-medium text-gray-700 mb-2">새 비밀번호 확인</label>
+                        <input type="password" id="confirmPw"
+                               class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="새 비밀번호를 다시 입력하세요.">
+                        <p  id="confirmPwError" th:if="${#fields.hasErrors('confirmPw')}" th:errors="*{confirmPw}" class="text-xs text-red-500 mt-1"></p>
+                    </div>
+
 
                     <!-- nickname -->
                     <div class="mt-6">
@@ -31,6 +49,14 @@
                         <input type="text" id="nickname" th:field="*{nickname}" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="사용할 닉네임을 입력하세요.">
                         <p th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="text-xs text-red-500 mt-1"></p>
                     </div>
+
+                    <!-- social -->
+<!--                    <div class="mt-6" th:if="${memberFormDTO.email != null}">-->
+<!--                        <label for="social" class="block text-sm font-medium text-gray-700 mb-2">소셜 계정 여부</label>-->
+<!--                        <input type="checkbox" id="social" name="social" th:checked="${memberFormDTO.social}" class="h-4 w-4 text-gray-600 border-gray-300 rounded focus:ring-0">-->
+<!--                        <span class="ml-2 text-sm text-gray-700">소셜 계정으로 가입하셨습니까?</span>-->
+<!--                    </div>-->
+
 
                     <!-- hidden fields
                     <input type="hidden" th:field="*{social}" />
@@ -41,7 +67,8 @@
 
                     <!-- Action Buttons -->
                     <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end">
-                        <button  th:formaction="@{/members/new}" type="submit" class="rounded-md bg-gray-800 py-2 px-6 text-sm font-semibold text-white shadow-sm hover:bg-gray-700">회원가입</button>
+                        <button th:formaction="${memberFormDTO.email != null} ? @{/members/modify} : @{/members/new}" type="submit"
+                                class="rounded-md bg-gray-800 py-2 px-6 text-sm font-semibold text-white shadow-sm hover:bg-gray-700" th:text="${memberFormDTO.email != null} ? '회원 정보 수정' : '회원가입'"></button>
                     </div>
                 </form>
             </div>

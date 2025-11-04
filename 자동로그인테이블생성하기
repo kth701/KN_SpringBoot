@@ -1,0 +1,15 @@
+
+    자동 로그인 설정하기 : 데이터베이스 이용
+
+        1. 자동 로그인 위한 테이블 생성하기
+            CREATE TABLE persistent_logins(
+                username 	VARCHAR(64) NOT NULL,
+                series 		VARCHAR(64) PRIMARY KEY,
+                token 		VARCHAR(64) NOT NULL,
+                last_used 	TIMESTAMP NOT NULL
+            );
+        2. DataSource, CustomUserDetailService 객체 주입하기
+        3. http.rememberMe()메서드 자동 로그인 토큰 저장소 설정하기: DB정보, 인증절차, 유효기간
+        4. login form에서 넘어온 매개변수설정하기 : 생략시-> "remember-me" 설정됨. 또는 직접 명시적으로 설정
+        5. 로그아웃("/logout')경우 => "remember-me"쿠키의 삭제기능이 구현되면 DB에 삭제반영됨.
+            - 테스트용: remember-me, JSESSIONID 순서대로 삭제시 ->쿠키의 삭제시 동일한 기능(단, DB에는 정보가 그대로 유지)
