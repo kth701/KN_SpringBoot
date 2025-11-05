@@ -26,9 +26,10 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+
     @Override
-//    public Member saveMember(MemberDTO memberDTO) {
     public Member saveMember(MemberFormDTO memberFormDTO) {
+//    public Member saveMember(MemberDTO memberDTO) {
         // 1.
         //Member member = Member.createMember(memberDTO);
 
@@ -37,19 +38,33 @@ public class MemberServiceImpl implements MemberService {
         Member member = dtoToEntity(memberDTO, passwordEncoder);     // memberDTO -> Entity
 
         // 2.2 회원 중복 체크(email)기준
-        validateDuplicatemember(member);
-        /*  회원 중복 체크 함수(메서드)로 별로 정의하여 호출
+        /*  회원 중복 체크 함수(메서드)로 별로 정의하여 호출  허가
+        *  validateDuplicatemember(member);
+        * */
+
         Member findMember =  memberRepository.findByEmail(member.getEmail());
-        if (findMember!=null) throw  new IllegalStateException("이미 가입된 회원입니다.");
-         */
+        if (findMember!=null) throw  new IllegalStateException("DuplicateMember");  //  자바스크립트에서  e.getMessage()속성 값에 따라른 error message  처리
 
         // 2.3 중복된 이메일 없을 경우 저장(반영)
         return memberRepository.save(member);
     }
+        /*
+        // 회원 중복 체크(email)처리하는 메서드 정의
+        // entity -> 이메일 유무체크
+        private void validateDuplicatemember(Member member){
+            Member findMember =  memberRepository.findByEmail(member.getEmail());
+            if (findMember!=null) throw  new IllegalStateException("이미 가입된 회원입니다.");
+        }
+     */
 
+
+    // 이메일로 회원 정보 조회 구현
+    @Transactional(readOnly = true)
     @Override
     public MemberFormDTO findMember(String email) {
+        // 1. 이메일로 회원 정보 조회
         Member member = memberRepository.findByEmail(email);
+        if (member == null) throw  new IllegalStateException("MemberNotFound");  //  자바스크립트에서  e.getMessage()속성 값에 따라른 error message  처리
 
         MemberFormDTO memberFormDTO = new MemberFormDTO();
 
@@ -62,13 +77,6 @@ public class MemberServiceImpl implements MemberService {
         return memberFormDTO;
     }
 
-
-    // 회원 중복 체크(email)처리하는 메서드 정의
-    // entity -> 이메일 유무체크
-    private void validateDuplicatemember(Member member){
-        Member findMember =  memberRepository.findByEmail(member.getEmail());
-        if (findMember!=null) throw  new IllegalStateException("이미 가입된 회원입니다.");
-    }
 
     // 회원 정보 수정 구현
     @Override

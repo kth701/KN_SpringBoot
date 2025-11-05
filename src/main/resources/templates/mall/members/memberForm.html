@@ -7,15 +7,22 @@
     <div layout:fragment="content">
         <div class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
             <div class="bg-white p-8 md:p-12 rounded-lg border border-gray-200">
-                <h1 class="text-2xl font-bold text-gray-900 mb-8">회원가입</h1>
+                <!-- 1개의 폼 view로 입력폼과 조회(수정)폼으로 사용 하기 -->
+                <h1  th:if="${memberFormDTO.email == null}" class="text-2xl font-bold text-gray-900 mb-8">회원가입</h1>
+                <h1  th:if="${memberFormDTO.email != null}" class="text-2xl font-bold text-gray-900 mb-8">회원정보</h1>
 
                 <form th:object="${memberFormDTO}" method="post">
                     <!-- email -->
                     <div class="mt-6">
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-2">이메일 (로그인 ID)</label>
-                        <input type="email" id="email" th:field="*{email}" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="이메일 주소를 입력하세요.">
+<!--                        <input type="email" id="email" th:field="*{email}" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="이메일 주소를 입력하세요.">-->
+                        <input type="email" id="email" th:field="*{email}"
+                               th:readonly="${memberFormDTO.email != null}"
+                               class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm"
+                               th:classappend="${memberFormDTO.email != null} ? 'bg-gray-100' : ''"
+                               placeholder="이메일 주소를 입력하세요.">
                         <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-xs text-red-500 mt-1"></p>
-                        <p th:if="${errorMessage}" th:text="${errorMessage}"  class="text-xs text-red-500 mt-1"></p><!--회원 중복 가입 메시지-->
+                        <p id="emailError"  class="text-xs text-red-500 mt-1"></p><!--회원 중복 가입 메시지-->
                     </div>
 
                     <!-- Current Password (only for member modification) -->
@@ -23,7 +30,7 @@
                         <label for="currentPw" class="block text-sm font-medium text-gray-700 mb-2">현재 비밀번호</label>
                         <input type="password" id="currentPw" th:field="*{currentPw}"
                                class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="현재 비밀번호를 입력하세요.">
-                        <p id="currentPwError" th:if="${#fields.hasErrors('currentPw')}" th:errors="*{currentPw}" class="text-xs text-red-500 mt-1"></p>
+                        <p id="currentPwError" class="text-xs text-red-500 mt-1"></p>
                     </div>
 
                     <!-- New Password -->
@@ -37,9 +44,9 @@
                     <!-- Confirm New Password (only for member modification) -->
                     <div class="mt-6" th:if="${memberFormDTO.email != null}">
                         <label for="confirmPw" class="block text-sm font-medium text-gray-700 mb-2">새 비밀번호 확인</label>
-                        <input type="password" id="confirmPw"
+                        <input type="password" id="confirmPw"  th:field="*{confirmPw}"
                                class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="새 비밀번호를 다시 입력하세요.">
-                        <p  id="confirmPwError" th:if="${#fields.hasErrors('confirmPw')}" th:errors="*{confirmPw}" class="text-xs text-red-500 mt-1"></p>
+                        <p  id="confirmPwError" class="text-xs text-red-500 mt-1"></p>
                     </div>
 
 
@@ -47,7 +54,7 @@
                     <div class="mt-6">
                         <label for="nickname" class="block text-sm font-medium text-gray-700 mb-2">닉네임</label>
                         <input type="text" id="nickname" th:field="*{nickname}" class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="사용할 닉네임을 입력하세요.">
-                        <p th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="text-xs text-red-500 mt-1"></p>
+
                     </div>
 
                     <!-- social -->
@@ -91,15 +98,28 @@
     <script layout:fragment="myscript" th:inline="javascript">
 
         // 서버로 부터 회원 가입 중복 메시지가 있으면 처리
-        const errorMessage = [[${errorMessage}]]
-        const emailCheck = document.querySelector('#email');
+        const errorMessage = [[${errorMessage}]] // email에러
 
-        // 이메일 중복시 서버에 보낸 에러메시지 처리
-        if (errorMessage){
-          emailCheck.innerHTML = errorMessage;
-          console.log("errorMessage:"+errorMessage)
+        const emailError = document.querySelector('#emailError'); // emailError
+        const currentPwError =   document.querySelector('#currentPwError');// 현재 비밀번호 확인
+        const confirmPwError =   document.querySelector('#confirmPwError');// 새 비밀번호 확인
+
+
+        // ------------------------------------------------------------------------------------------ //
+        //서버에 보낸 에러메시지 처리
+        // ------------------------------------------------------------------------------------------ //
+         //currentPwError.innerHTML = "";
+         //emailError.innerHTML = "";
+
+        if (errorMessage==="currentPw" ){
+          currentPwError.innerHTML = "현재 비밀번호가 일치하지 않습니다.";
+        } else  if  (errorMessage==="confirmPw" ){
+            confirmPwError.innerHTML = "새 비밀번호와 새 비밀번호확인이 일치하지 않습니다.";
+        } else if (errorMessage==="MemberNotFound") {
+            emailError.innerHTML = "이미 가입된 회원입니다.";
+        } else if  (errorMessage==="DuplicateMember") {
+           emailError.innerHTML =  "미가입 회원입니다. 회원 가입이 필요합니다."
         }
-
     </script>
 
 </html>
