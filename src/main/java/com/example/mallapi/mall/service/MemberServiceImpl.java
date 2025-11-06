@@ -3,12 +3,15 @@ package com.example.mallapi.mall.service;
 import com.example.mallapi.mall.domain.Member;
 import com.example.mallapi.mall.dto.MemberDTO;
 import com.example.mallapi.mall.dto.MemberFormDTO;
+import com.example.mallapi.mall.exception.member.MemberExceptions;
 import com.example.mallapi.mall.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -42,8 +45,27 @@ public class MemberServiceImpl implements MemberService {
         *  validateDuplicatemember(member);
         * */
 
+        // 방법1.
         Member findMember =  memberRepository.findByEmail(member.getEmail());
-        if (findMember!=null) throw  new IllegalStateException("DuplicateMember");  //  자바스크립트에서  e.getMessage()속성 값에 따라른 error message  처리
+        //  자바스크립트에서  e.getMessage()속성 값에 따라른 error message  처리
+        if (findMember!=null) throw  MemberExceptions.DUPLICATE.get();
+        //if (findMember!=null) throw  new IllegalStateException("DuplicateMember"); // 상태메시지
+
+        /* test
+            if (findMember != null) {
+                log.info("------------ 중복 체크 확인");
+                log.info(findMember.toString());
+                throw   MemberExceptions.DUPLICATE.get();
+            }
+         */
+
+        /*
+        // 방법2
+        Optional<Member> result = memberRepository.findById(member.getEmail());
+        boolean isResult = result.isPresent();
+        if (isResult) throw MemberExceptions.DUPLICATE.get();;
+         */
+
 
         // 2.3 중복된 이메일 없을 경우 저장(반영)
         return memberRepository.save(member);
@@ -63,15 +85,19 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberFormDTO findMember(String email) {
         // 1. 이메일로 회원 정보 조회
-        Member member = memberRepository.findByEmail(email);
-        if (member == null) throw  new IllegalStateException("MemberNotFound");  //  자바스크립트에서  e.getMessage()속성 값에 따라른 error message  처리
+//        Member member = memberRepository.findByEmail(email);
+//        if (member == null) throw  new IllegalStateException("MemberNotFound");  //  자바스크립트에서  e.getMessage()속성 값에 따라른 error message  처리
+
+
+        // 방법2.
+        Optional<Member> result = memberRepository.findById(email);
+        Member member = result.orElseThrow(MemberExceptions.NOT_FOUND::get);
+
 
         MemberFormDTO memberFormDTO = new MemberFormDTO();
 
         memberFormDTO.setEmail(member.getEmail());
-        //memberFormDTO.setPw(member.getPw()); // 새 비빌번호
-        //memberFormDTO.setCurrentPw(member.getPw()); // 현재 비밀번호
-        memberFormDTO.setSavedPw(member.getPw()); // 기존 비밀번호
+        memberFormDTO.setSavedPw(member.getPw()); // 기존 DB에 저장된 비밀번호
         memberFormDTO.setNickname(member.getNickname());
 
         return memberFormDTO;

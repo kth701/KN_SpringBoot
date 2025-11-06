@@ -1,4 +1,4 @@
-package com.example.mallapi.mall.exception;
+package com.example.mallapi.mall.exception.securityconfig;
 
 
 import jakarta.servlet.ServletException;

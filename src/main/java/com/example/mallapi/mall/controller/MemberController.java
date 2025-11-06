@@ -2,6 +2,7 @@ package com.example.mallapi.mall.controller;
 
 import com.example.mallapi.mall.domain.Member;
 import com.example.mallapi.mall.dto.MemberFormDTO;
+import com.example.mallapi.mall.exception.member.MemberExceptions;
 import com.example.mallapi.mall.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -89,12 +90,17 @@ public class MemberController {
 
         } catch (Exception e) {// -> 중복된 이메일 등록시 예외발생 처리
 
-            // -> 자바스크립트에 처리할 메서지
-            model.addAttribute("errorMessage", e.getMessage());
+            //  자바스크립트에 처리할 메서지
+            // e.getMessage()메서드 사용자가 정의 클래스의 message멤버변수값 추출
+            model.addAttribute("errorMessage", e);
+            log.info("----- e.toString(): {}", e.toString());
+            log.info("----- errorMessage: {}", e.getMessage());
 
             // 회원 가입에서 중복체크시 memberFormDTO.setEmail()에 값 있는 것으로 판단하여 회원조회(수정)폼 이동을 방지 하기 위해
             // 인위적으로 값을 null로설해서 회원 가입 폼으로 인식 시킴
-            if (e.getMessage().equals("DuplicateMember")) memberFormDTO.setEmail(null);
+            if (e.getMessage().equals("DUPLICATE")) memberFormDTO.setEmail(null);
+            //  MemberExceptions 커스텀 예외처리 클래스
+
 
             return "mall/members/memberForm";
         }
@@ -123,8 +129,11 @@ public class MemberController {
                  view에 memberFormDTO속성에 data binding
              */
 
-            //  자바스크립트에서  e.getMessage()속성 값에 따라른 error message  처리
-            model.addAttribute("errorMessage", e.getMessage());
+
+            //  자바스크립트에 처리할 메서지
+            // e.getMessage()메서드 사용자가 정의 클래스의 message멤버변수값 추출
+            model.addAttribute("errorMessage", e);
+            log.info("----- errorMessage: {}", e.getMessage());
         }
 
         return "mall/members/memberForm";
@@ -150,7 +159,9 @@ public class MemberController {
             log.info("-------- 현재비밀번호: {} , 기존비밀번호: {} ", memberFormDTO.getCurrentPw(), findMemberFormDTO.getSavedPw());
             if ( !passwordEncoder.matches(memberFormDTO.getCurrentPw(), findMemberFormDTO.getSavedPw()) ) {
                 log.info("--------------------- {}", "현재 비밀번호 불일치");
-                throw new IllegalStateException("currentPw");
+                throw MemberExceptions.BAD_CREDENTIALS.get(); //  MemberExceptions 커스텀 예외처리 클래스
+                //throw new IllegalStateException("currentPw");
+
             }
 
             log.info("--------------------- {}", "현재 비밀번호 일치");
@@ -166,7 +177,8 @@ public class MemberController {
 
             //  2. 새비밀번호와 새비밀번호화인 동일 여부 체크
             if (!memberFormDTO.getPw().equals(memberFormDTO.getConfirmPw()))  {
-                throw new IllegalStateException("confirmPw");
+                throw MemberExceptions.INVALID.get(); //  MemberExceptions 커스텀 예외처리 클래스
+                //throw new IllegalStateException("confirmPw");
             }
 
             // 회원 정보 수정 서비스 구현
@@ -174,9 +186,10 @@ public class MemberController {
             log.info("=> modifiedMember:" + savedMember);
 
         } catch (Exception e) {// -> 중복된 이메일 등록시 예외발생 처리
-            //  자바스크립트에서  e.getMessage()속성 값에 따라른 error message  처리
-            log.info("-------------------------------- {}", e.getMessage());
-            model.addAttribute("errorMessage", e.getMessage());
+
+            //  자바스크립트에 처리할 메서지
+            // e.getMessage()메서드 사용자가 정의 클래스의 message멤버변수값 추출
+            model.addAttribute("errorMessage", e);
             return "mall/members/memberForm";
         }
 

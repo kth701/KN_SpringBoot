@@ -1,7 +1,7 @@
 package com.example.mallapi.config;
 
-import com.example.mallapi.mall.exception.Custom403Handler;
-import com.example.mallapi.mall.exception.CustomAuthenticationEntryPoint;
+import com.example.mallapi.mall.exception.securityconfig.Custom403Handler;
+import com.example.mallapi.mall.exception.securityconfig.CustomAuthenticationEntryPoint;
 import com.example.mallapi.mall.security.CustomUserDetailService;
 import com.example.mallapi.mall.security.handler.APILoginFailHandler;
 import com.example.mallapi.mall.security.handler.APILoginSuccessHandler;
