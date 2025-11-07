@@ -2,11 +2,15 @@ package com.example.mallapi.mall.controller;
 
 import com.example.mallapi.mall.domain.Member;
 import com.example.mallapi.mall.dto.MemberFormDTO;
+import com.example.mallapi.mall.dto.search.MemberSearchDTO;
 import com.example.mallapi.mall.exception.member.MemberExceptions;
 import com.example.mallapi.mall.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +20,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
+import java.util.Optional;
+
 @Controller
 @RequiredArgsConstructor
 @Log4j2
@@ -24,6 +31,9 @@ public class MemberController {
 
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder; // 회원 정보  수정작업 -> 암호화된 비밀번호와  암호화되기전 현재 비밀번호 값일치 여부확인용
+
+    //  같은 도메인에서 요청한 url 인지 식별(rest api, 다른 도메인)
+    //String sessionRequestUrl = "";
 
     // 회원 등록 화면
     @GetMapping(value = {"/new"})
@@ -204,8 +214,35 @@ public class MemberController {
 
     // ------------------------------------- //
     // 회원 목록
+    // 중복되는 url이 없도록 하나의 컨트롤러에는 하나의 url을 배정하는 방식
+    // "/members" , "/members/{page}  => 전체 URL
     // ------------------------------------- //
+    @GetMapping(value={"","/{page}"})
+    public String memberManage(
+            MemberSearchDTO  memberSearchDTO,
+            @PathVariable("page") Optional<Integer> page,
+            Model model ) {
 
+        /*  */
+
+        // 회원 페이지 기본 설정
+        //PageRequest.of(현재페이지번호, 한페이지에 가져올 데이터 개수)
+        Pageable pageable = PageRequest.of(page.orElse(0), 10 );// page객체가 널이면 0으로 설정
+
+        // 회원 목록 요청 서비스(검색)
+        List<MemberFormDTO> members  = memberService.getAdminMemberPage(memberSearchDTO, pageable);
+        log.info("--> searchDTO, members");
+        log.info("search:"+memberSearchDTO);
+        log.info("result members: "+members.toString());
+
+        model.addAttribute("members", members);
+        model.addAttribute("memberSearchDTO", memberSearchDTO);
+        model.addAttribute("maxPage", 5); // 페이지 블럭단위(1화면 5페이지)
+
+
+
+        return "mall/members/memberMng";
+    }
 
 
 
@@ -215,8 +252,14 @@ public class MemberController {
     // ----------------------------------- //
     // 1. 로그인
     @GetMapping(value="/login")
-    public String loginMember(String error, String logout){
+    public String loginMember(String error, String logout, HttpServletRequest request){
         log.info("=>get mapping login");
+
+        //  같은 도메인에서 요청한 url 인지 식별(rest api, 다른 도메인)
+        //StringBuffer requestURL = request.getRequestURL();
+        //sessionRequestUrl =  requestURL.toString();
+
+
 
         return "mall/members/loginForm";
     }
@@ -226,7 +269,79 @@ public class MemberController {
         log.info("=>login error");
 
         model.addAttribute("loginErrorMsg", "아이디 또는 비밀번호 확인해주세요");
+        //model.addAttribute("requestUrl", sessionRequestUrl);
         return "mall/members/loginForm";
     }
 
 }
+
+
+/*
+요청 URL 추출  Sample예제
+
+1. 객체 주입 및 메서드 사용
+
+import jakarta.servlet.http.HttpServletRequest; // 또는 javax.servlet.http.HttpServletRequest
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class UrlController {
+
+    @GetMapping("/api/test")
+    public String getUrlInfo(HttpServletRequest request) {
+        // 1. 전체 URL (프로토콜, 호스트, 포트, 경로 포함, 쿼리 파라미터 제외)
+        StringBuffer requestURL = request.getRequestURL();
+
+        // 2. URI (경로 부분, 컨텍스트 경로 포함, 쿼리 파라미터 제외)
+        String requestURI = request.getRequestURI();
+
+        // 3. 쿼리 스트링 (Key=Value&Key=Value)
+        String queryString = request.getQueryString();
+
+        // 4. 요청 메서드 (GET, POST, PUT 등)
+        String method = request.getMethod();
+
+        // 5. 서버명 (Host)
+        String serverName = request.getServerName();
+
+        // 6. 서버 포트
+        int serverPort = request.getServerPort();
+
+        // 전체 URL + 쿼리 스트링 (직접 조합)
+        String fullUrl = requestURL.toString() + (queryString != null ? "?" + queryString : "");
+
+        System.out.println("Full URL: " + fullUrl);
+        System.out.println("URI: " + requestURI);
+
+        return "URL 정보를 콘솔에 출력했습니다.";
+    }
+}
+
+2. UriComponentsBuilder 사용
+
+URL을 생성하거나 현재 요청 기반으로 URL을 구성할 때 유용한 Spring 클래스입니다. 정적 메서드 fromCurrentRequest() 등을 사용해 현재 요청의 정보
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import java.net.URI;
+
+@RestController
+public class AnotherUrlController {
+
+    @GetMapping("/api/another-test")
+    public String getUriComponentsInfo() {
+        // 현재 요청에 기반한 URI 정보를 가져옵니다.
+        URI currentUri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+
+        System.out.println("Current URI: " + currentUri.toString());
+        System.out.println("Path: " + currentUri.getPath());
+
+        return "UriComponentsBuilder 정보 출력 완료.";
+    }
+}
+
+
+ */

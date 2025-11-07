@@ -96,35 +96,38 @@
 
     <!-- 현재 페이지에서만 사용하는 javasscript 정의 -->
     <script layout:fragment="myscript" th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
 
-        // 서버로 부터 회원 가입 중복 메시지가 있으면 처리 errorDuplicateMessage
-        const errorMessage = [[${errorMessage}]] // email에러
+            // 서버로 부터 회원 가입 중복 메시지가 있으면 처리 errorDuplicateMessage
+            const errorMessage = [[${errorMessage}]] // email에러
 
-        const emailError = document.querySelector('#emailError'); // emailError
-        const currentPwError =   document.querySelector('#currentPwError');// 현재 비밀번호 확인
-        const confirmPwError =   document.querySelector('#confirmPwError');// 새 비밀번호 확인
+            const emailError = document.querySelector('#emailError'); // emailError
+            const currentPwError =   document.querySelector('#currentPwError');// 현재 비밀번호 확인
+            const confirmPwError =   document.querySelector('#confirmPwError');// 새 비밀번호 확인
 
-        if (errorMessage != null ) { // 에러가 발생 했을 경우에만 처리
-            console.log("-> errorMessage msg:",errorMessage.message)
-            console.log("-> errorMessage:",errorMessage)
+            if (errorMessage != null ) { // 에러가 발생 했을 경우에만 처리
+                console.log("-> errorMessage msg:",errorMessage.message)
+                console.log("-> errorMessage:",errorMessage)
 
 
-            // ------------------------------------------------------------------------------------------ //
-            //서버로 받은 에러 메시지에 따라 폼에 표시할 메시지
-            // ------------------------------------------------------------------------------------------ //
-            if (errorMessage.message ==="BAD_CREDENTIALS" ){
-              currentPwError.innerHTML = "현재 비밀번호가 일치하지 않습니다.";
-            } else  if  (errorMessage.message ==="INVALID" ){
-                confirmPwError.innerHTML = "새 비밀번호와 새 비밀번호확인이 일치하지 않습니다.";
-            } else if  (errorMessage.message ==="NOT_FOUND") {
-               emailError.innerHTML =  "미 가입 회원입니다. 회원 가입이 필요합니다."
+                // ------------------------------------------------------------------------------------------ //
+                //서버로 받은 에러 메시지에 따라 폼에 표시할 메시지
+                // ------------------------------------------------------------------------------------------ //
+                if (errorMessage.message ==="BAD_CREDENTIALS" ){
+                  currentPwError.innerHTML = "현재 비밀번호가 일치하지 않습니다.";
+                } else  if  (errorMessage.message ==="INVALID" ){
+                    confirmPwError.innerHTML = "새 비밀번호와 새 비밀번호확인이 일치하지 않습니다.";
+                } else if  (errorMessage.message ==="NOT_FOUND") {
+                   emailError.innerHTML =  "미 가입 회원입니다. 회원 가입이 필요합니다."
 
-            } else if (errorMessage.message ==="DUPLICATE" ) { // 에러 메세지 텅빈 상태임(test중)
-                emailError.innerHTML = "이미 가입된 회원입니다.";
+                } else if (errorMessage.message ==="DUPLICATE" ) { // 에러 메세지 텅빈 상태임(test중)
+                    emailError.innerHTML = "이미 가입된 회원입니다.";
+                }
+            }else {
+                console.log("-> no error")
             }
-        }else {
-            console.log("-> no error")
-        }
+
+        });
     </script>
 
 </html>

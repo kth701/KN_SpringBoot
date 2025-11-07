@@ -3,14 +3,18 @@ package com.example.mallapi.mall.service;
 import com.example.mallapi.mall.domain.Member;
 import com.example.mallapi.mall.dto.MemberDTO;
 import com.example.mallapi.mall.dto.MemberFormDTO;
+import com.example.mallapi.mall.dto.search.MemberSearchDTO;
 import com.example.mallapi.mall.exception.member.MemberExceptions;
 import com.example.mallapi.mall.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,6 +32,8 @@ public class MemberServiceImpl implements MemberService {
      */
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private final ModelMapper  modelMapper;
 
 
     @Override
@@ -114,6 +120,24 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.save(member);
 
     }
+
+    // 회원 목록 List
+    @Transactional(readOnly = true)
+    @Override
+    public List<MemberFormDTO> getAdminMemberPage(MemberSearchDTO memberSearchDTO, Pageable pageable) {
+        List<MemberFormDTO> members;
+        members = memberRepository.searchMembers( memberSearchDTO,  pageable)
+//                .map(member -> entityToMemberDTO(member) )
+//                .map(memberDTO -> memberDTOtoForm(memberDTO) )
+                .map(this::entityToMemberDTO)
+                .map(this::memberDTOtoForm)
+                .toList();
+
+//        return memberRepository.searchMembers( memberSearchDTO,  pageable);
+        return members;
+    }
+
+
 
 
 

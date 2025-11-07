@@ -54,9 +54,9 @@ public class CustomSecurityConfig {
      */
 
     /*@Autowired
-    CustomUserDetailService customUserDetailService;    // 세션 정보 객체로 등록한다는 의미
+    CustomUserDetailService customUserDetailService;    // 회원정보 DB정보를 memberDTO저장 및 세션(session) 객체 등록
      */
-    private final CustomUserDetailService customUserDetailService; // 세션 정보 객체로 등록한다는 의미
+    private final CustomUserDetailService customUserDetailService; // 회원정보 DB정보를 memberDTO저장 및 세션(session) 객체 등록
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

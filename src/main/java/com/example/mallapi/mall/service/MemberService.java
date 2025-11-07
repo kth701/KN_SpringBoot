@@ -4,6 +4,8 @@ import com.example.mallapi.mall.domain.Member;
 import com.example.mallapi.mall.domain.MemberRole;
 import com.example.mallapi.mall.dto.MemberDTO;
 import com.example.mallapi.mall.dto.MemberFormDTO;
+import com.example.mallapi.mall.dto.search.MemberSearchDTO;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -50,6 +52,28 @@ public interface MemberService {
 
         return member;
     }
+    default MemberDTO entityToMemberDTO(Member member){
+        return new MemberDTO(
+                member.getEmail(),
+                member.getPw(),
+                member.getNickname(),
+                member.isSocial(),
+                member.isDel(),
+                member.getMemberRolesList().stream().map(Enum::name).toList() // 참조 메서드
+                // member.getMemberRolesList().stream().map(memberRole -> memberRole.name()).toList()
+        );
+    }
+    default MemberFormDTO memberDTOtoForm(MemberDTO memberDTO) {
+        MemberFormDTO memberForm = new MemberFormDTO();
+        memberForm.setEmail(memberDTO.getEmail());
+        memberForm.setPw(memberDTO.getPw());
+        memberForm.setNickname(memberDTO.getNickname());
+        memberForm.setSocial(memberDTO.isSocial());
+        memberForm.setDel(memberDTO.isDel());
+        return memberForm;
+
+
+    }
 
     // 회원 조회
     public MemberFormDTO findMember(String email);
@@ -61,6 +85,6 @@ public interface MemberService {
 //    public void deleteMember(String email);
 
     // 회원 목록
-//    public List<Member> getMemberList();
+    List<MemberFormDTO> getAdminMemberPage(MemberSearchDTO memberSearchDTO, Pageable pageable);
 
 }

@@ -106,10 +106,21 @@
 
 <script layout:fragment="myscript" th:inline="javascript">
     const error = [[${error}]] // loginErrorMsg
+    //const sesstionUrl [[${requestUrl}]] // 요청한 url , 다른 도메인에서 요청한 url인지 식별
+
     console.log("error", error)
     if (error=="ERROR_LOGIN") { // error객체 값이 있으면 처리
-        alert("아이디 또는 비밀번호를 확인해주세요");
-        // window.location.href="/members/login/error"
+
+        //if (sessionUrl == "다른 도메인 url") {
+
+            //alert("아이디 또는 비밀번호를 확인해주세요");
+
+        //}  else {
+
+            // 같은 도메인에서 url 요청이면 처리
+            window.location.href="/members/login/error"
+
+        //}
     }
 </script>
 

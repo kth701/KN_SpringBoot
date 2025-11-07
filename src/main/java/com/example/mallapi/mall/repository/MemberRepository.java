@@ -1,15 +1,26 @@
 package com.example.mallapi.mall.repository;
 
+import com.example.mallapi.mall.domain.Item;
 import com.example.mallapi.mall.domain.Member;
+import com.example.mallapi.mall.repository.search.MemberSearch;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
-public interface MemberRepository extends JpaRepository<Member, String> {
+//public interface MemberRepository extends JpaRepository<Member, String> { // 수정 전 (검색 , 조회 기능 구현 전)
+public interface MemberRepository extends JpaRepository<Member, String>,
+        // 검색관련 인터페이스 상속
+        // MemberSearch : Querydsl로 구현한 => 회원정보 목록, 검색 페이징, query문
+        QuerydslPredicateExecutor<Item>, MemberSearch {
 
-//    @Query("select m from Member m join fetch m.memberRolesList where m.email = :email ")
-//    Member getWithRoles(@Param("email") String email);
+
+
+    /*
+    @Query("select m from Member m join fetch m.memberRolesList where m.email = :email ")
+    Member getWithRoles(@Param("email") String email);
+     */
 
     // 연관된 부모 Entity하나만 연관되어 관리(항상 부모와 함께 저장하고, 삭제됨)
     // @EntityGraph => N+1방지및 최적화
@@ -20,6 +31,7 @@ public interface MemberRepository extends JpaRepository<Member, String> {
     // 주문서, 장바구니에서 Security로그인한 username(email) 또는 회원정보조회시 회원정보 추출하는 메서드
     Member findByEmail(String email); // 이메일로 회원 조회
 
+    // 회원  정보 관리 목록 조회 : 검색 기능
 
 }
 

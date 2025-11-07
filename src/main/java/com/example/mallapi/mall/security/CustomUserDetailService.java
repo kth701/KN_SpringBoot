@@ -2,6 +2,7 @@ package com.example.mallapi.mall.security;
 
 import com.example.mallapi.mall.domain.Member;
 import com.example.mallapi.mall.dto.MemberDTO;
+import com.example.mallapi.mall.exception.member.MemberExceptions;
 import com.example.mallapi.mall.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -29,6 +30,7 @@ public class CustomUserDetailService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
+    // 로그인 성공시 회원정보 DB정보를 memberDTO저장 및 세션(session) 객체 등록
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("-----------loadUserByUsername------------" + username);
@@ -75,7 +77,8 @@ public class CustomUserDetailService implements UserDetailsService {
         //  시큐리티 로그인에서 전달받은 username을 통해 Member Entity 데이터 가져오기
         Member member = memberRepository.getWithRoles(username);
         if(member == null){
-            throw new UsernameNotFoundException("Not Found");
+            //throw new UsernameNotFoundException("Not Found");
+            throw MemberExceptions.NOT_FOUND.get(); // 수정후
         }
 
         // User클래스로 부터 상속받은 MemberSecurityDTO

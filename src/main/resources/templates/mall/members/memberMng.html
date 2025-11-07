@@ -1,0 +1,128 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/.thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content">
+    <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        
+        <!-- 페이지 헤더 -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-900">회원 관리</h1>
+        </div>
+
+        <div class="bg-white p-8 md:p-10 rounded-lg border border-gray-200">
+            <!-- 검색 폼 -->
+            <form th:action="@{/admin/members}" method="get" th:object="${memberSearchDTO}" class="mb-8">
+                <div class="space-y-5">
+                    <!-- 필터 영역 -->
+                    <div class="flex items-center gap-x-4">
+                        <span class="text-sm font-medium text-gray-600">필터:</span>
+                        <div class="flex gap-x-2">
+                            <select th:field="*{searchDateType}" class="w-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <option value="all">전체기간</option>
+                                <option value="1d">1일</option>
+                                <option value="1w">1주</option>
+                                <option value="1m">1개월</option>
+                                <option value="6m">6개월</option>
+                            </select>
+                            <select th:field="*{searchBy}" class="w-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <option value="email">이메일</option>
+                                <option value="nickname">닉네임</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- 검색창 영역 -->
+                    <div class="flex gap-2">
+                        <div class="relative flex-grow">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <input type="search" th:field="*{searchQuery}" placeholder="검색어를 입력하세요" class="block w-full rounded-md border-gray-300 py-2.5 pl-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        </div>
+                        <button type="submit" class="searchBtn rounded-md bg-gray-800 py-2 px-6 text-sm font-semibold text-white shadow-sm hover:bg-gray-700">검색</button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- 회원 목록 테이블 -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이메일(ID)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">닉네임</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">소셜</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">가입일</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">탈퇴</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="member : ${members}" class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                <a th:href="@{'/admin/member/' + ${member.email}}" class="hover:underline hover:text-indigo-600" th:text="${member.email}"></a>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${member.nickname}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${member.social} ? 'Y' : 'N'"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#temporals.format(member.regTime, 'yyyy-MM-dd')}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:if="${member.isDel()}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Y</span>
+                                <span th:unless="${member.isDel()}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">N</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${members.isEmpty()}">
+                            <td colspan="5" class="text-center py-10 text-sm text-gray-500">조회된 회원이 없습니다.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 페이징 처리 -->
+            <div th:if="${!members.isEmpty()}" th:with="start=${(members.number/maxPage)*maxPage+1}, end=${members.totalPages==0 ? 1 : (start+(maxPage-1) < members.totalPages ? start+(maxPage-1): members.totalPages)}" class="mt-8">
+                <nav class="flex items-center justify-center gap-x-2">
+                    <a th:onclick="${members.first} ? 'return false;' : 'page(' + ${members.number-1} + ')'" 
+                       th:class="${members.first} ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'" 
+                       class="min-w-[36px] h-9 flex items-center justify-center rounded-md px-2 text-sm font-medium">
+                        Previous
+                    </a>
+
+                    <div th:each="page: ${#numbers.sequence(start, end)}">
+                        <a th:onclick="'page(' + ${page-1} + ')'"
+                           th:text="${page}" 
+                           th:class="${members.number == page-1} ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-100'" 
+                           class="min-w-[36px] h-9 flex items-center justify-center rounded-md text-sm font-medium cursor-pointer">
+                        </a>
+                    </div>
+
+                    <a th:onclick="${members.last} ? 'return false;' : 'page(' + ${members.number+1} + ')'" 
+                       th:class="${members.last} ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'" 
+                       class="min-w-[36px] h-9 flex items-center justify-center rounded-md px-2 text-sm font-medium">
+                        Next
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 현재 페이지에서만 사용하는 javasscript 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+    function page(pageNumber) {
+        const form = document.querySelector('form');
+        const action = form.getAttribute('action');
+        // URL에서 페이징 부분을 제거하고 새로운 페이지 번호로 설정
+        const newAction = action.replace(/\/\d*$/, '/' + pageNumber);
+        form.setAttribute('action', newAction);
+        form.submit();
+    }
+
+    document.querySelector('.searchBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        page(0);
+    });
+</script>
+
+</html>

@@ -29,6 +29,7 @@ public interface ItemRepository extends JpaRepository<Item, Long>,
     // 결론 -> QuerydslPredicateExecutor인터페이스를 상속 받으면 조건처리할 수 있는 함수를 제공
 
     // ----------------------------------------------------------------------------- //
+    // 쿼리문 테스트하기
     // 1.1 단순 Query문 처리시:  find + (엔티티이름) + By + 변수(필드)명
     // ----------------------------------------------------------------------------- //
 
@@ -51,6 +52,9 @@ public interface ItemRepository extends JpaRepository<Item, Long>,
     @Query(value = "select * from item where item_detail like concat('%', :itemDetail, '%') order by price desc",
             nativeQuery = true)
     List<Item> findByItemDetailNative(@Param("itemDetail") String itemDetail);
+    // ----------------------------------------------------------------------------- //
+
+
 
 }
 
