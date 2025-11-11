@@ -101,7 +101,7 @@
                     </a>
 
                     <!-- 현재 페이지 번호에 해당되는 페이지블럭 페이지 범위 숫자 출력, 현재 페이지 번호와 숫자가 일치화면 페이지 링크 기능 비활성화  -->
-                    <div th:each="page: ${#numbers.sequence(start, end)}">
+                    <div th:each="page: ${#numbers.sequence(start, end)}"><!-- javascript page(링크할 페이지번호) 함수 호출-->
                         <a th:onclick="'page(' + ${page-1} + ')'"
                            th:text="${page}" 
                            th:class="${items.number == page-1} ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-100'" 
@@ -174,7 +174,7 @@
 
       // 서버요청시  : 조건 검색 전달
       location.href = "/admin/items/"+page+"?" +
-                      "&searchDateType=" + searchDateType +
+                      "searchDateType=" + searchDateType +
                       "&searchSellStatus="+ searchSellStatus +
                       "&searchBy=" + searchBy +
                       "&searchQuery=" + searchQuery;

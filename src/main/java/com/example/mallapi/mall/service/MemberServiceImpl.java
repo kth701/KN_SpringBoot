@@ -9,12 +9,14 @@ import com.example.mallapi.mall.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -124,17 +126,27 @@ public class MemberServiceImpl implements MemberService {
     // 회원 목록 List
     @Transactional(readOnly = true)
     @Override
-    public List<MemberFormDTO> getAdminMemberPage(MemberSearchDTO memberSearchDTO, Pageable pageable) {
-        List<MemberFormDTO> members;
-        members = memberRepository.searchMembers( memberSearchDTO,  pageable)
+    public Map<String, Object> getAdminMemberPage(MemberSearchDTO memberSearchDTO, Pageable pageable) {
+
+        Page<Member> memberPage = memberRepository.searchMembers( memberSearchDTO,  pageable);
+
+        List<MemberFormDTO> membersContent;
+        membersContent = memberPage.getContent().stream()
 //                .map(member -> entityToMemberDTO(member) )
 //                .map(memberDTO -> memberDTOtoForm(memberDTO) )
                 .map(this::entityToMemberDTO)
                 .map(this::memberDTOtoForm)
                 .toList();
 
-//        return memberRepository.searchMembers( memberSearchDTO,  pageable);
-        return members;
+
+        log.info("-------- getAdminMemberPage: {}", memberPage .getContent());
+
+        Map<String, Object> result = Map.of(
+                "memberContent", membersContent,
+                "members", memberPage);
+
+        return result;
+
     }
 
 

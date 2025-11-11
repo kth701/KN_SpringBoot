@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -204,7 +206,7 @@ public class MemberController {
         }
 
 
-        return "mall/members/memberForm"; // 회원 목록 List로 수정
+        return "/members"; // 회원 목록 List로 수정
     }
 
 
@@ -227,15 +229,21 @@ public class MemberController {
 
         // 회원 페이지 기본 설정
         //PageRequest.of(현재페이지번호, 한페이지에 가져올 데이터 개수)
-        Pageable pageable = PageRequest.of(page.orElse(0), 10 );// page객체가 널이면 0으로 설정
+        Pageable pageable = PageRequest.of(page.orElse(0), 2 );// page객체가 널이면 0으로 설정
 
         // 회원 목록 요청 서비스(검색)
-        List<MemberFormDTO> members  = memberService.getAdminMemberPage(memberSearchDTO, pageable);
-        log.info("--> searchDTO, members");
+        Map<String, Object> membersResult  = memberService.getAdminMemberPage(memberSearchDTO, pageable);
+        log.info("-----> searchDTO, members");
         log.info("search:"+memberSearchDTO);
-        log.info("result members: "+members.toString());
+        log.info("result members: "+membersResult.toString());
 
-        model.addAttribute("members", members);
+        Page<Member> members = (Page<Member>) membersResult.get("members");
+        List<MemberFormDTO> memberContent = ( List<MemberFormDTO>)membersResult.get("memberContent");
+
+
+        // 페이징 처리 속성와 페이징에 표시될 데이터(entity->dto(로그인성공시 데이터추출)->FormDTO 분리 처리
+        model.addAttribute("memberContent", memberContent); // 페이징에 보여질 데이터
+        model.addAttribute("members", members);   // 페이징 관련 정보
         model.addAttribute("memberSearchDTO", memberSearchDTO);
         model.addAttribute("maxPage", 5); // 페이지 블럭단위(1화면 5페이지)
 

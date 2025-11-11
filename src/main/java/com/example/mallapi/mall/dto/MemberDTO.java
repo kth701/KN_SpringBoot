@@ -6,6 +6,7 @@ import lombok.ToString;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,8 @@ public class MemberDTO extends User {
     private List<String> roleNames = new ArrayList<>();
 
     private Map<String ,Object> props; // 소셜 로그인 정보
+    private LocalDateTime regTime; // 가입날짜
+    //private LocalDateTime updateTime;
 
 
 
@@ -43,7 +46,8 @@ public class MemberDTO extends User {
                             String nickname,
                             boolean social,
                             boolean del,
-                            List<String> roleNames
+                            List<String> roleNames,
+                            LocalDateTime regTime // 가입 날짜
                                      ) {
         // Spring Security의 User 클래스 생성자 호출
         // User객체는 스프링 시큐리티에서 사용하는  세션 정보 객체는 User생성자를 통해 데이터를 전달받아 세션정보객체 생성
@@ -64,6 +68,7 @@ public class MemberDTO extends User {
         this.social = social;
         this.del = del;
         this.roleNames = roleNames;//"USER","MANAGER","ADMIN"
+        this.regTime = regTime;
     }
 
     // JWT문자열 생성시 사용하기 위함
@@ -76,6 +81,7 @@ public class MemberDTO extends User {
         dataMap.put("social", this.social);
         dataMap.put("del", this.del);
         dataMap.put("roleNames", roleNames);
+        dataMap.put("regTime", regTime);// 가입 날짜
 
         return dataMap;
 

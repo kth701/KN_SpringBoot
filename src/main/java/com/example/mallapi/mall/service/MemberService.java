@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MemberService {
 
@@ -28,7 +29,8 @@ public interface MemberService {
                 memberFormDTO.getNickname(),
                 false,
                 false,
-                List.of("USER")
+                List.of("USER"),
+                memberFormDTO.getRegTime()
         );
     }
 
@@ -59,8 +61,9 @@ public interface MemberService {
                 member.getNickname(),
                 member.isSocial(),
                 member.isDel(),
-                member.getMemberRolesList().stream().map(Enum::name).toList() // 참조 메서드
+                member.getMemberRolesList().stream().map(Enum::name).toList(),                          // 참조 메서드
                 // member.getMemberRolesList().stream().map(memberRole -> memberRole.name()).toList()
+                member.getRegTime()
         );
     }
     default MemberFormDTO memberDTOtoForm(MemberDTO memberDTO) {
@@ -70,6 +73,7 @@ public interface MemberService {
         memberForm.setNickname(memberDTO.getNickname());
         memberForm.setSocial(memberDTO.isSocial());
         memberForm.setDel(memberDTO.isDel());
+        memberForm.setRegTime(memberDTO.getRegTime());
         return memberForm;
 
 
@@ -84,7 +88,7 @@ public interface MemberService {
     // 회원 삭제
 //    public void deleteMember(String email);
 
-    // 회원 목록
-    List<MemberFormDTO> getAdminMemberPage(MemberSearchDTO memberSearchDTO, Pageable pageable);
+    // 회원 목록, Entity-> DTO -> FormEntity 과정에 필요한 여러 데이터 타입 추출
+    Map<String, Object> getAdminMemberPage(MemberSearchDTO memberSearchDTO, Pageable pageable);
 
 }

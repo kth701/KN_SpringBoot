@@ -24,18 +24,20 @@ public class JWTUtil {
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
 
     /**
-     * JWT 토큰을 생성합니다.
+     * JWT 토큰을 생성
      *
      * @param valueMap 페이로드(payload)에 포함될 클레임(claim) 맵
      * @param min      토큰의 유효 기간 (분 단위)
      * @return 생성된 JWT 문자열
+     * dataMap문자열: MemberDTO클래스에 있는 getClaims() 구현시 반환된 dataMap
+     * -> 로그인 성공시(APILoginSuccessHandler클래스에서 JWT발급) 추출한 정보(MemberDTO클래스 getClaims()구현시 dataMap객체 생성 ) -> JWT문자열 생성 하기 위한 dataMap
      */
     public static String generateToken(Map<String, Object> valueMap, int min) {
         return Jwts.builder()
                 .header() // 헤더(Header) 설정
                 .add("typ", "JWT") // 토큰 타입: JWT
                 .and()
-                .claims(valueMap) // 페이로드(claims)에 전달된 맵 데이터 설정
+                .claims(valueMap) // 페이로드(claims)에 전달된 맵 데이터 설정(dataMap)
                 .issuedAt(Date.from(ZonedDateTime.now().toInstant())) // 발행 시간(iat)
                 .expiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant())) // 만료 시간(exp)
                 .signWith(SECRET_KEY) // 서명(Signature): 지정된 비밀키와 HS256 알고리즘으로 서명

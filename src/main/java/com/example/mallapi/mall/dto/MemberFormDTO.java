@@ -3,8 +3,13 @@ package com.example.mallapi.mall.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
+
+import java.time.LocalDateTime;
 
 
 /*
@@ -35,4 +40,6 @@ public class MemberFormDTO {
 
     private boolean social;
     private boolean del;
+    private LocalDateTime regTime;
+    //private LocalDateTime updateTime;
 }

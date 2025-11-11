@@ -88,11 +88,16 @@ public class CustomUserDetailService implements UserDetailsService {
                 member.getNickname(),
                 member.isSocial(),
                 member.isDel(),
-                // 회원 Role, getName()=>USER(0), MANAGER(1), ADMIN(2) 숫자대신 문자열
-                // "USER", "MANAGER", "ADMIN"
+                /*
+                 회원 Role, getName()=>USER(0), MANAGER(1), ADMIN(2) 숫자대신 문자열
+                 "USER", "MANAGER", "ADMIN"
+                 */
                 member.getMemberRolesList()
                         .stream()
-                        .map(Enum::name).collect(Collectors.toList())
+                        .map(Enum::name).collect(Collectors.toList()),
+
+                // 추후 가입날짜
+                 member.getRegTime()
                          /*
                         //또는
                         .map(memberRole ->

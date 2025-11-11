@@ -14,7 +14,7 @@
 
         <div class="bg-white p-8 md:p-10 rounded-lg border border-gray-200">
             <!-- 검색 폼 -->
-            <form th:action="@{/admin/members}" method="get" th:object="${memberSearchDTO}" class="mb-8">
+            <form th:action="@{'/members'}" method="get" th:object="${memberSearchDTO}" class="mb-8">
                 <div class="space-y-5">
                     <!-- 필터 영역 -->
                     <div class="flex items-center gap-x-4">
@@ -61,9 +61,10 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr th:each="member : ${members}" class="hover:bg-gray-50">
+                    <!-- members.getContent() -->
+                        <tr th:each="member : ${memberContent}" class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                <a th:href="@{'/admin/member/' + ${member.email}}" class="hover:underline hover:text-indigo-600" th:text="${member.email}"></a>
+                                <a th:href="@{'/members/find/' + ${member.email}}" class="hover:underline hover:text-indigo-600" th:text="${member.email}"></a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${member.nickname}"></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${member.social} ? 'Y' : 'N'"></td>
@@ -89,9 +90,9 @@
                         Previous
                     </a>
 
-                    <div th:each="page: ${#numbers.sequence(start, end)}">
+                    <div th:each="page: ${#numbers.sequence(start, end)}"><!-- javascript page(링크할 페이지번호) 함수 호출 -->
                         <a th:onclick="'page(' + ${page-1} + ')'"
-                           th:text="${page}" 
+                           th:text="${page}"
                            th:class="${members.number == page-1} ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-100'" 
                            class="min-w-[36px] h-9 flex items-center justify-center rounded-md text-sm font-medium cursor-pointer">
                         </a>
@@ -108,21 +109,55 @@
     </div>
 </div>
 
-<!-- 현재 페이지에서만 사용하는 javasscript 정의 -->
+<!-- 현재 페이지에서만 사용하는 CSS정의 -->
+<style layout:fragment="mystyle"  th:inline="css">
+
+
+</style>
+
+<!-- 현재 페이지에서만 사용하는 javascript 정의 -->
 <script layout:fragment="myscript" th:inline="javascript">
     function page(pageNumber) {
-        const form = document.querySelector('form');
-        const action = form.getAttribute('action');
-        // URL에서 페이징 부분을 제거하고 새로운 페이지 번호로 설정
-        const newAction = action.replace(/\/\d*$/, '/' + pageNumber);
-        form.setAttribute('action', newAction);
-        form.submit();
+        console.log('--- page() call with pageNumber:', pageNumber);
+
+      var current_page = [[${members.number}]]
+    // 현재 페이지번호와 선택된 페이지 번호가 동일하면 링크 해제
+      if (pageNumber == current_page) {
+         //alert('현재 페이지입니다.')
+          return
+      }
+
+
+      // 검색버튼에서 page요청시 -> 선택페이지와 현재페이번호 비교판단 없이 검색 활성화 설정
+       if (page == -100) page = 0;
+
+
+      // 조건 검색시 선택된 필터 조건 값
+      let searchDateType    = document.querySelector('#searchDateType').value;
+     let searchBy          = document.querySelector('#searchBy').value;
+      let searchQuery       = document.querySelector('#searchQuery').value;
+
+      //console.log(searchDateType)
+      //console.log(searchBy)
+      //console.log(searchQuery)
+
+      // 서버요청시  : 조건 검색 전달
+      location.href = "/members/"+pageNumber+"?" +
+                      "searchDateType=" + searchDateType +
+                      "&searchBy=" + searchBy +
+                      "&searchQuery=" + searchQuery;
+
     }
 
+    // searchBtn(검색버튼) 클릭시 처리
     document.querySelector('.searchBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        page(0);
+        e.preventDefault(); // 내장된 이벤트 삭제
+
+        // 검색 버튼 클릭 시 항상 첫 페이지(0)로 이동하도록 설정
+        // 페이지 번호 클릭시 page()함수 호출과 구분
+        page(-100);
     });
+
 </script>
 
 </html>

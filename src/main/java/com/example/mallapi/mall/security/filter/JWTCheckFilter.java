@@ -16,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
                     (String)claims.get("nickname"),
                     (Boolean) claims.get("social"),
                     (Boolean) claims.get("del"),
-                    roleNames
+                    roleNames,
+                    (LocalDateTime) claims.get("regTime") // 가입 날짜
             );
             log.info("--> JWT claims:"+memberDTO);
 
