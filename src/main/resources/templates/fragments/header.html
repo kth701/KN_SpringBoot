@@ -9,10 +9,20 @@
                 <a href="#" class="text-3xl font-bold text-gray-900">ModernShop</a>
                 <div class="hidden md:flex items-center space-x-6">
                     <a href="/"  th:href="@{/}" class="text-gray-600 hover:text-gray-900">Home</a>
+                    <!-- 관리 모드 -->
                     <a href="/admin/item/new"  th:href="@{/admin/item/new}" sec:authorize="hasAnyAuthority('ROLE_ADMIN')"
                          class="text-gray-900 font-bold">상품등록</a>
                     <a href="/admin/items" th:href="@{/admin/items}" sec:authorize="hasAnyAuthority('ROLE_ADMIN')"
                         class="text-gray-600 hover:text-gray-900">상품관리</a>
+<!--                    <a href="/admin/items" th:href="@{/members}" sec:authorize="hasAnyAuthority('ROLE_ADMIN')"-->
+<!--                     class="text-gray-600 hover:text-gray-900">회원관리</a>-->
+                    <!-- 테스트용 -->
+                    <a href="/members"  th:href="@{/members}"
+                       class="text-gray-600 hover:text-gray-900">회원관리</a>
+
+                    <!-- 일반 회원  모드: MemberController에서 '현재 로그인 사용자' 와 '실제 접속자의 이메일' 동일 여부 판단하여 접근여부 판별 -->
+                    <a  th:href="@{|/members/find/${#authentication.principal.username}|}" sec:authorize="isAuthenticated()"
+                       class="text-gray-600 hover:text-gray-900">회원정보수정</a>
                     <a href="/cart" th:href="@{/cart}" sec:authorize="isAuthenticated()"
                         class="text-gray-600 hover:text-gray-900">장바구니</a>
                     <a href="/orders" th:href="@{/orders}" sec:authorize="isAuthenticated()"
@@ -22,13 +32,12 @@
                 <!-- 로그아웃 상태일 경우 활성화 -->
                 <a href="/members/login"  th:href="@{/members/login}" sec:authorize="isAnonymous()"
                     class="text-gray-600 hover:text-gray-900">Login</a>
-                <!-- 로그인 상태일 경우 회원 정보 추출
+
+                <!-- 로그인 상태일 경우 회원 정보 추출  방법
                    주의: MemberDTO memberDTO = (MemberDTO)authentication.getPrincipal(); memberDTO.getNickname() ->"principal.nickname" 바로 사용
                  -->
-                <!-- 로그인 상태일 경우 활성화 : 방법1
-                <span sec:authorize="isAuthenticated()"
-                          sec:authentication="principal.nickname"
-                          class="text-gray-600 hover:text-gray-900"></span>   -->
+                <!-- 로그인 상태일 경우 활성화 : 방법1 -->
+                <!-- <span sec:authorize="isAuthenticated()" sec:authentication="principal.nickname" class="text-gray-600 hover:text-gray-900"></span>   -->
                <!-- 로그인 상태일 경우 활성화 : 방법2 -->
                <span sec:authorize="isAuthenticated()"
                     th:text="|${#authentication.principal.nickname}님|"
@@ -36,7 +45,8 @@
                </span>
                <a href="/logout"  th:href="@{/members/logout}" sec:authorize="isAuthenticated()"
                   class="text-gray-600 hover:text-gray-900">Logout</a>
-               <a href="/members/new" th:href="@{/members/new}" class="bg-gray-900 text-white px-4 py-2 rounded-    full hover:bg-gray-800">Sign Up</a>
+                <a href="/members/new" th:href="@{/members/new}" sec:authorize="isAnonymous()"
+                   class="bg-gray-900 text-white px-4 py-2 rounded-    full hover:bg-gray-800">Sign Up</a>
            </div>
        </nav>
    </header>

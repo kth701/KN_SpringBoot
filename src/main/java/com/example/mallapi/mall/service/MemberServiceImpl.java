@@ -101,12 +101,25 @@ public class MemberServiceImpl implements MemberService {
         Optional<Member> result = memberRepository.findById(email);
         Member member = result.orElseThrow(MemberExceptions.NOT_FOUND::get);
 
+        // entity -> dto 변환
+        MemberDTO memberDTO = entityToMemberDTO(member);
+        // dto -> form dto 변환
+        MemberFormDTO memberFormDTO = memberDTOtoForm(memberDTO);
 
+
+       /*
         MemberFormDTO memberFormDTO = new MemberFormDTO();
 
         memberFormDTO.setEmail(member.getEmail());
         memberFormDTO.setSavedPw(member.getPw()); // 기존 DB에 저장된 비밀번호
         memberFormDTO.setNickname(member.getNickname());
+        memberFormDTO.setSocial(member.isSocial());
+        memberFormDTO.setDel(member.isDel());
+        memberFormDTO.setRegTime(member.getRegTime());
+
+        memberFormDTO.setRoleNames(member.getMemberRolesList().stream().map(Enum::name).toList());
+         */
+
 
         return memberFormDTO;
     }

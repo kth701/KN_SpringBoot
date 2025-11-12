@@ -97,6 +97,7 @@ public class MemberController {
             //Member savedMember = memberService.saveMember(memberDTO); // 수정전
              */
 
+
             Member savedMember = memberService.saveMember(memberFormDTO); // 수정후
             log.info("=> savedMember:" + savedMember);
 
@@ -123,6 +124,8 @@ public class MemberController {
     // ------------------------------------- //
     // 회원 조회
     // ------------------------------------- //
+    // 현재 로그인 사용자와 매니저 및 관리자만 접근할 수 있게 어노테이션 추가
+     //@PreAuthorize("#email == authentication.principal.username or hasAnyRole('MANAGER', 'ADMIN')")
     @GetMapping(value={"/find/{email}"})
     public String findMember(@PathVariable("email") String email,
                              MemberFormDTO memberFormDTO,    // 회원 정보 유무와 관계 없이 view에서 memberFormDTO객체에 data binding되어 있어 메서드내에 사용할 수 있는 객체로 선언
@@ -165,18 +168,27 @@ public class MemberController {
 
 
         try {
-            //  1. 현재 비빌 번호로 DB에 저장된 비밀번호 동일 여부 체크
-            // 회원 정보  수정작업 -> 암호화된 비밀번호와  암호화되기전 현재 비밀번호 값일치 여부확인용
+             /* 비빌번호 변경 기능 별도 구현 -> 테스트용으로 회원 정보수정에서 비밀번호 확인후  새비밀번호 설정하는 기능 구현
+                : 입력비밀번호 확인, 새비밀번호, 새비밀번호 확인
+
+              1. 현재 비빌 번호로 DB에 저장된 비밀번호 동일 여부 체크
+                 : 암호화회원 정보  수정작업 -> 암호화된 비밀번호와  암호화되기전 현재 비밀번호 값일치 여부확인용
+
+              */
+            // 테스트 구간 시작  :  비밀번호 확인후 새비밀번호 설정하는 기능 구현 필요 없을 경우 주석 처리
             MemberFormDTO  findMemberFormDTO = memberService.findMember(memberFormDTO.getEmail());
             log.info("-------- 현재비밀번호: {} , 기존비밀번호: {} ", memberFormDTO.getCurrentPw(), findMemberFormDTO.getSavedPw());
+
+
             if ( !passwordEncoder.matches(memberFormDTO.getCurrentPw(), findMemberFormDTO.getSavedPw()) ) {
                 log.info("--------------------- {}", "현재 비밀번호 불일치");
                 throw MemberExceptions.BAD_CREDENTIALS.get(); //  MemberExceptions 커스텀 예외처리 클래스
                 //throw new IllegalStateException("currentPw");
-
             }
+             log.info("--------------------- {}", "현재 비밀번호 일치");
+            // 테스트 구간 끝
 
-            log.info("--------------------- {}", "현재 비밀번호 일치");
+
 
 
             // 서버쪽에서 DTO 데이터 유효성 검사
@@ -205,8 +217,7 @@ public class MemberController {
             return "mall/members/memberForm";
         }
 
-
-        return "/members"; // 회원 목록 List로 수정
+        return "redirect:/members"; // 회원 목록 List로 수정
     }
 
 

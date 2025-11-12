@@ -67,14 +67,19 @@ public interface MemberService {
         );
     }
     default MemberFormDTO memberDTOtoForm(MemberDTO memberDTO) {
-        MemberFormDTO memberForm = new MemberFormDTO();
-        memberForm.setEmail(memberDTO.getEmail());
-        memberForm.setPw(memberDTO.getPw());
-        memberForm.setNickname(memberDTO.getNickname());
-        memberForm.setSocial(memberDTO.isSocial());
-        memberForm.setDel(memberDTO.isDel());
-        memberForm.setRegTime(memberDTO.getRegTime());
-        return memberForm;
+        MemberFormDTO memberFormDTO = new MemberFormDTO();
+
+        memberFormDTO.setEmail(memberDTO.getEmail());
+
+        memberFormDTO.setSavedPw(memberDTO.getPw()); // 기존 DB에 저장된 비밀번호
+
+        memberFormDTO.setNickname(memberDTO.getNickname());
+        memberFormDTO.setSocial(memberDTO.isSocial());
+        memberFormDTO.setDel(memberDTO.isDel());
+        memberFormDTO.setRegTime(memberDTO.getRegTime());
+
+        memberFormDTO.setRoleNames(memberDTO.getRoleNames());
+        return memberFormDTO;
 
 
     }

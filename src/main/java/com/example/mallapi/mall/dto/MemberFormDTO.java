@@ -10,6 +10,8 @@ import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /*
@@ -41,5 +43,7 @@ public class MemberFormDTO {
     private boolean social;
     private boolean del;
     private LocalDateTime regTime;
+
+    private List<String> roleNames = new ArrayList<>();
     //private LocalDateTime updateTime;
 }

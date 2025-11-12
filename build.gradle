@@ -41,6 +41,8 @@ dependencies {
 
 	// gson
 	implementation 'com.google.code.gson:gson:2.10.1'
+    // jackson-datatype-jsr310 : java LocalDateTime타입인  regTime 객체 에러발생시
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1' // 사용 중인 Jackson 버전에 맞춰 조정
     
     // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
