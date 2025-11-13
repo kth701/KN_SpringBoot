@@ -64,6 +64,7 @@ public class Member extends BaseEntity {
      * @param memberDTO 회원 정보 DTO
      * @param passwordEncoder 비밀번호 암호화기
      * @return Member 엔티티
+     * 현재 날짜로 설정 (등록날짜, 수정날짜), anonymousUser로  등록자, 수정자 자동 초기화 처리됨
      */
     public static Member createMember(MemberDTO memberDTO, PasswordEncoder passwordEncoder) {
         return Member.builder()

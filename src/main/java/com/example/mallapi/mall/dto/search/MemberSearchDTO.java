@@ -2,12 +2,14 @@ package com.example.mallapi.mall.dto.search;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 회원 정보 목록의 검색 조건을 담는 DTO
  */
 @Getter
 @Setter
+@ToString
 public class MemberSearchDTO {
 
     /**
@@ -30,10 +32,12 @@ public class MemberSearchDTO {
     /**
      * 소셜 로그인 회원 필터링 여부
      */
-    private Boolean searchSocial;
+    private String socialType;
 
     /**
      * 탈퇴 회원 필터링 여부
      */
-    private Boolean searchDel;
+    private String  delFlag;
+
+
 }

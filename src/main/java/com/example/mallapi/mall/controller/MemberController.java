@@ -176,6 +176,7 @@ public class MemberController {
 
               */
             // 테스트 구간 시작  :  비밀번호 확인후 새비밀번호 설정하는 기능 구현 필요 없을 경우 주석 처리
+            /*
             MemberFormDTO  findMemberFormDTO = memberService.findMember(memberFormDTO.getEmail());
             log.info("-------- 현재비밀번호: {} , 기존비밀번호: {} ", memberFormDTO.getCurrentPw(), findMemberFormDTO.getSavedPw());
 
@@ -186,6 +187,7 @@ public class MemberController {
                 //throw new IllegalStateException("currentPw");
             }
              log.info("--------------------- {}", "현재 비밀번호 일치");
+             */
             // 테스트 구간 끝
 
 

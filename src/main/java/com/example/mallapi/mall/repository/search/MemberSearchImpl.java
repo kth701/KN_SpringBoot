@@ -64,6 +64,41 @@ public class MemberSearchImpl implements MemberSearch {
     }
 
     /**
+     * 소셜 가입 여부 필터링 조건을 생성하는 private 헬퍼 메소드.
+     *
+     * @param socialType 소셜 가입 여부 (예: "all", "social", "normal")
+     * @return 생성된 BooleanExpression. 조건이 없으면 null 반환.
+     */
+    private BooleanExpression socialTypeEq(String socialType) {
+        if (StringUtils.isEmpty(socialType) || StringUtils.equals("all", socialType)) {
+            return null;
+        }
+        if (StringUtils.equals("Y", socialType)) {
+            return QMember.member.social.eq(true);
+        } else if (StringUtils.equals("N", socialType)) {
+            return QMember.member.social.eq(false);
+        }
+        return null;
+    }
+
+    /**
+     * 탈퇴 여부 필터링 조건을 생성하는 private 헬퍼 메소드.
+     *
+     * @param delFlag 탈퇴 여부 (예: "all", "true", "false")
+     * @return 생성된 BooleanExpression. 조건이 없으면 null 반환.
+     */
+    private BooleanExpression delFlagEq(String delFlag) {
+        if (StringUtils.isEmpty(delFlag) || StringUtils.equals("all", delFlag)) {
+            return null;
+        }
+        // "true" 문자열과 비교
+        if (StringUtils.equals("Y", delFlag)) return QMember.member.del.eq(true);
+        else // "false" 문자열과 비교
+            if (StringUtils.equals("N", delFlag)) return QMember.member.del.eq(false);
+        return null;
+    }
+
+    /**
      * 검색어 필터링 조건을 생성하는 private 헬퍼 메소드.
      * searchBy 값(email, nickname)에 따라 해당 필드에서 LIKE 검색을 수행.
      *
@@ -88,6 +123,8 @@ public class MemberSearchImpl implements MemberSearch {
         return null;
     }
 
+
+
     /**
      * 관리자 페이지에서 사용할 회원 목록을 동적 쿼리와 페이징을 적용하여 조회.
      *
@@ -105,6 +142,8 @@ public class MemberSearchImpl implements MemberSearch {
                 .where( // WHERE 절: 동적 조건들을 결합. 조건이 null이면 해당 조건은 무시됨.
                         regDtsAfter(memberSearchDTO.getSearchDateType()), // 가입일 조건
                         searchByLike(memberSearchDTO.getSearchBy(), memberSearchDTO.getSearchQuery()) // 검색어 조건
+                        , socialTypeEq(memberSearchDTO.getSocialType()) // 소셜 가입 여부 조건
+                        , delFlagEq(memberSearchDTO.getDelFlag()) // 탈퇴 여부 조건
                 )
                 .orderBy(member.regTime.desc()) // 가입일 기준 내림차순 정렬
                 .offset(pageable.getOffset())   // 페이징: 시작 오프셋 설정 (예: 2페이지 -> 10번째부터)
@@ -118,6 +157,8 @@ public class MemberSearchImpl implements MemberSearch {
                 .where( // 데이터 조회와 동일한 조건 적용
                         regDtsAfter(memberSearchDTO.getSearchDateType()),
                         searchByLike(memberSearchDTO.getSearchBy(), memberSearchDTO.getSearchQuery())
+                        , socialTypeEq(memberSearchDTO.getSocialType())
+                        , delFlagEq(memberSearchDTO.getDelFlag())
                 )
                 .fetchOne(); // 쿼리를 실행하고 단일 결과(long 타입)를 반환
 

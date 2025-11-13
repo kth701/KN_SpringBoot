@@ -30,10 +30,13 @@
                                th:value="${memberFormDTO.email != null ? '${memberFormDTO.savedPw}' : ''}"
                               th:classappend="${memberFormDTO.email != null} ? 'bg-gray-100' : ''"
                      -->
-                    <div class="mt-6" th:if="${memberFormDTO.email != null}">
-                        <label for="currentPw" class="block text-sm font-medium text-gray-700 mb-2">현재 비밀번호(테스트용)</label>
+                    <div class="mt-6" th:if="${memberFormDTO.email != null}" >
+                        <label for="currentPw" class="block text-sm font-medium text-gray-700 mb-2">기존 비밀번호(테스트용)</label>
                         <input type="password" id="currentPw"
                                th:field="*{currentPw}"
+                               th:readonly="${memberFormDTO.email != null}"
+                               th:value="${memberFormDTO.email != null ? '${memberFormDTO.savedPw}' : ''}"
+                               th:classappend="${memberFormDTO.email != null} ? 'bg-gray-100' : ''"
                                class="block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0 sm:text-sm" placeholder="현재 비밀번호를 입력하세요.">
                         <p id="currentPwError" class="text-xs text-red-500 mt-1"></p>
                     </div>
@@ -56,6 +59,7 @@
                     </div>
 
 
+
                     <!-- nickname -->
                     <div class="mt-6">
                         <label for="nickname" class="block text-sm font-medium text-gray-700 mb-2">닉네임</label>
@@ -65,23 +69,27 @@
 
                     <!-- social -->
                     <div class="mt-6" th:if="${memberFormDTO.email != null}">
-                        <label for="social" class="block text-sm font-medium text-gray-700 mb-2">소셜 계정 여부</label>
-                        <input type="checkbox" id="social" name="social" th:checked="${memberFormDTO.social}" class="h-4 w-4 text-gray-600 border-gray-300 rounded focus:ring-0">
-                        <span class="ml-2 text-sm text-gray-700">소셜 계정으로 가입하셨습니까? <span th:text="${memberFormDTO.social} ? '예' : '아니오'"></span>
+<!--                        <label for="social" class="block text-sm font-medium text-gray-700 mb-2">소셜 계정 가입여부</label>-->
+<!--                        <input type="checkbox" id="social" name="social" th:checked="${memberFormDTO.social}"   class="h-4 w-4 text-gray-600 border-gray-300 rounded focus:ring-0">-->
+                        <span class="ml-2 text-sm text-gray-700">회원가입 유형: <span th:text="${memberFormDTO.social} ? '소설계정 가입' : '일반회원 가입'"></span>
                         </span>
                     </div>
 
                     <!-- 탈퇴 여부:  가입상태일때만 처리 또는 매니저및 관리자모드일 경우 처리 -->
                     <div class="mt-6" th:if="${memberFormDTO.email != null && !memberFormDTO.del ||  ( #lists.contains(memberFormDTO.roleNames, 'MANAGER') or #lists.contains(memberFormDTO.roleNames, 'ADMIN') )  }">
-                        <label for="del" class="block text-sm font-medium text-gray-700 mb-2">탈퇴 여부</label>
+                        <label for="del" class="block text-sm font-medium text-gray-700 mb-2">회원 탈퇴하려면 체크하세요.</label>
                         <input type="checkbox" id="del" name="del" th:checked="${memberFormDTO.del}" class="h-4 w-4 text-gray-600 border-gray-300 rounded focus:ring-0">
-                        <span class="ml-2 text-sm text-gray-700">가입상태: <span th:text="${!memberFormDTO.del} ? '가입상태' : '탈퇴상태'"></span></span>
+                        <span class="ml-2 text-sm text-gray-700"><span th:text="${!memberFormDTO.del} ? '회원' : '비회원(탈퇴)'"></span></span>
                     </div>
 
                     <!-- 권한 설정 checkbox:  현재로그인상태이고 구분자 관계없이 '메니저' 또는 '관리자'모드에서 모두표시 -->
+                    <!-- test  [[${memberFormDTO.roleNames}]]  --->
+                    <!--
                     <div class="mt-6" th:if="${#authorization.expression('hasRole(''MANAGER'')') || #authorization.expression('hasRole(''ADMIN'')')}">
+                    -->
+                    <div class="mt-6"><!-- test  용 -->
                         <label class="block text-sm font-medium text-gray-700 mb-2">권한 설정  </label>
-                        <!-- test --->  [[${memberFormDTO.roleNames}]]
+
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
                                 <input id="role_USER" name="roleNames" type="checkbox" value="USER"
@@ -94,7 +102,7 @@
                         </div>
                         <div class="relative flex items-start mt-2">
                             <div class="flex items-center h-5">
-                                <input id="role_MANAGER" name="roleNames" type="checkbox" value="ADMIN"
+                                <input id="role_MANAGER" name="roleNames" type="checkbox" value="MANAGER"
                                        th:checked="${#lists.contains(memberFormDTO.roleNames, 'MANAGER')}"
                                        class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
                             </div>

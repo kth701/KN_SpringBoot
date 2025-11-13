@@ -48,13 +48,7 @@ public class APILoginSuccessHandler implements AuthenticationSuccessHandler {
         claims.put("accessToken", accessToken);
         claims.put("refreshToken",refreshToken);
 
-        // 주의 : regTime 날짜 호환에러 -> 'jackson-datatype-jsr310' 라이브러리 추가 설치
-        // implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1' // 사용 중인 Jackson 버전에 맞춰 조정
-        //대부분의 Spring Boot 환경에서는 위의 의존성을 추가하기만 하면 Spring Boot의 자동 설정이 이 모듈을 
-        // Jackson ObjectMapper에 자동으로 등록해 줌
-        // 'Cannot serialize JWS Payload to JSON. Cause: Unable to serialize object of type io.jsonwebtoken.impl.DefaultClaims: Java 8 date/time type `java.time.LocalDateTime` not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (or disable `MapperFeature.REQUIRE_HANDLERS_FOR_JAVA8_TIMES`) (through reference chain: io.jsonwebtoken.impl.DefaultClaims["regTime"])' 에러 메시지
 
-        // user1@test.com,... 계정 정상 처리,  test1@test.com 에러 메시지 발생 ????
         Gson gson = new Gson();
         String json = gson.toJson(claims);
 

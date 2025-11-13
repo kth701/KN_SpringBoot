@@ -31,6 +31,16 @@
                                 <option value="email">이메일</option>
                                 <option value="nickname">닉네임</option>
                             </select>
+                            <select th:field="*{socialType}" class="w-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <option value="all" th:selected="${memberSearchDTO.socialType == 'all'}">소셜여부(전체)</option>
+                                <option value="Y" th:selected="${memberSearchDTO.socialType == 'Y'}">소셜회원</option>
+                                <option value="N" th:selected="${memberSearchDTO.socialType == 'N'}">일반회원</option>
+                            </select>
+                            <select th:field="*{delFlag}" class="w-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <option value="all" th:selected="${memberSearchDTO.delFlag == 'all'}">탈퇴여부(전체)</option>
+                                <option value="Y" th:selected="${memberSearchDTO.delFlag == 'Y'}">탈퇴회원</option>
+                                <option value="N" th:selected="${memberSearchDTO.delFlag == 'N'}">유지회원</option>
+                            </select>
                         </div>
                     </div>
                     <!-- 검색창 영역 -->
@@ -132,10 +142,22 @@
        if (pageNumber == -100) pageNumber = 0;
 
 
-      // 조건 검색시 선택된 필터 조건 값
-      let searchDateType    = document.querySelector('#searchDateType').value;
-     let searchBy          = document.querySelector('#searchBy').value;
-      let searchQuery       = document.querySelector('#searchQuery').value;
+   // 조건 검색시 선택된 필터 조건 값
+    let searchDateType    = document.querySelector('#searchDateType').value;
+    let searchBy          = document.querySelector('#searchBy').value;
+    let searchQuery       = document.querySelector('#searchQuery').value;
+    let socialType        = document.querySelector('#socialType').value;
+    let delFlag           = document.querySelector('#delFlag').value;
+
+
+      // 검색창에서 엔터 키 입력 시 검색 실행
+      document.querySelector('#searchQuery').addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+              e.preventDefault(); // 기본 엔터 동작 방지
+              page(0); // 검색 실행 (첫 페이지로)
+          }
+      });
+
 
       //console.log(searchDateType)
       //console.log(searchBy)
@@ -144,8 +166,9 @@
       // 서버요청시  : 조건 검색 전달
       location.href = "/members/"+pageNumber+"?" +
                       "searchDateType=" + searchDateType +
-                      "&searchBy=" + searchBy +
-                      "&searchQuery=" + searchQuery;
+                      "&socialType=" + socialType +
+                      "&delFlag=" + delFlag +
+                      "&searchBy=" + searchBy ;
 
     }
 

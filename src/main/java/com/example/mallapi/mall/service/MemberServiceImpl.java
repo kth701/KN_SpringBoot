@@ -45,6 +45,12 @@ public class MemberServiceImpl implements MemberService {
         //Member member = Member.createMember(memberDTO);
 
         // 2.1
+        //  회원등록일 경우 , 탈퇴여부 false로 기본 설정, role은 "USER"로 설정
+        memberFormDTO.setDel(false);
+        memberFormDTO.setRoleNames(List.of("USER"));
+
+        log.info("----------------------------- MemberSerivce saveMember()");
+        log.info("---------  memberFormDTO:  {}", memberFormDTO);
         MemberDTO memberDTO = memberFormToMemberDTO(memberFormDTO); // memberFormDTO -> MemberDTO(Security User DTO)
         Member member = dtoToEntity(memberDTO, passwordEncoder);     // memberDTO -> Entity
 
@@ -128,10 +134,12 @@ public class MemberServiceImpl implements MemberService {
     // 회원 정보 수정 구현
     @Override
     public Member updateMember(MemberFormDTO memberFormDTO) {
+        log.info("--------------- updateMember : ");
+        String isDel = memberFormDTO.isDel()?"Y":"N"; // boolea값으로 인식
+        log.info("---> memberFormDTO.isDel():  {}", isDel);
 
         MemberDTO memberDTO = memberFormToMemberDTO(memberFormDTO); // memberFormDTO -> MemberDTO(Security User DTO)
         Member member = dtoToEntity(memberDTO, passwordEncoder);     // memberDTO -> Entity
-
         return memberRepository.save(member);
 
     }

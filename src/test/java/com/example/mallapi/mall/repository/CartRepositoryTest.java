@@ -13,12 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional // Test처리한 다음 rollback처리 (원상복귀)
@@ -47,7 +45,8 @@ class CartRepositoryTest {
                 "test2",// nickname
                 false,// social
                 false,//del
-                List.of("USER")
+                List.of("USER"),
+                LocalDateTime.now()
         );
 
         // dto -> entity

@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
     MemberFormDTO: 클라이언트로 부터 회원 가입 정보 전달용
     User클래스로 부터 상속받아 MemberDTD에서 User객체 생성
  */
+
 @Getter@Setter@ToString
 //public class MemberDTO extends User  implements OAuth2User { // 1-1. 소셜 로그인 경우
 public class MemberDTO extends User {
@@ -67,9 +68,14 @@ public class MemberDTO extends User {
         this.nickname = nickname;
         this.social = social;
         this.del = del;
-        this.roleNames = roleNames;//"USER","MANAGER","ADMIN"
+        /* 주의
+            this.roleNames = roleNames;//"USER","MANAGER","ADMIN" => null상태됨
+            MemberDTO클래스 생성자에 stream()통해 순차적으로 데이터 입력
+         */
+        this.roleNames = roleNames.stream().map(String::toString).toList();
         this.regTime = regTime;
     }
+
 
     // JWT문자열 생성시 사용하기 위함
     public Map<String, Object> getClaims() {
@@ -81,7 +87,9 @@ public class MemberDTO extends User {
         dataMap.put("social", this.social);
         dataMap.put("del", this.del);
         dataMap.put("roleNames", roleNames);
-        dataMap.put("regTime", regTime);// 가입 날짜
+
+        dataMap.put("regTime", regTime.toString());// 가입 날짜:  날짜 타입은 문자열로 전환->JSON구조 호환 가능
+        // 'Cannot serialize JWS Payload to JSON. Cause: Unable to serialize object of type io.jsonwebtoken.impl.DefaultClaims: Java 8 date/time type `java.time.LocalDateTime` not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (or disable `MapperFeature.REQUIRE_HANDLERS_FOR_JAVA8_TIMES`) (through reference chain: io.jsonwebtoken.impl.DefaultClaims["regTime"])' 에러 메시지
 
         return dataMap;
 

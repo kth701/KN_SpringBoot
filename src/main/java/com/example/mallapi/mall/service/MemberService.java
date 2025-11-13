@@ -8,7 +8,6 @@ import com.example.mallapi.mall.dto.search.MemberSearchDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
 import java.util.Map;
 
 public interface MemberService {
@@ -23,15 +22,19 @@ public interface MemberService {
 
     // 0. memberFormDTO -> securityMemberDTO변환
     default MemberDTO memberFormToMemberDTO(MemberFormDTO memberFormDTO){
+
+
+        // 가입날짜
         return new MemberDTO(
                 memberFormDTO.getEmail(),
                 memberFormDTO.getPw(),
                 memberFormDTO.getNickname(),
-                false,
-                false,
-                List.of("USER"),
-                memberFormDTO.getRegTime()
-        );
+
+                //  생성자 형식 맞추기 위해 기본값 설정
+                memberFormDTO.isSocial(), // 소셜
+                memberFormDTO.isDel(),// 탈퇴: 회원가입인 경우 false넘겨받음, 회원수정인 경우 변경된 값 넘겨받음
+                memberFormDTO.getRoleNames(), // role -> 주의: MemberDTO클래스 생성자에 stream()통해 순차적으로 데이터 입력
+                memberFormDTO.getRegTime());
     }
 
     // 1.  dtoToEntity: MemberDto -> 암호화 -> Entity
@@ -48,7 +51,19 @@ public interface MemberService {
         member.setPw(password);
         member.setNickname(memberDTO.getNickname());
 
-        member.addRole(MemberRole.USER);// 권한 Role이 1개이상 경우 (List구조에 저장)
+        // 주의
+        // MemberFormDTO , MemberDTO 객체에는 role타입이   List<String> , Member  객체에는 role 타입 List<MemberRole>
+        member.clearRole(); // 기존에 Member 엔티티에 설정된 모든 역할을 삭제
+        memberDTO.getRoleNames().forEach(roleName -> {
+            // DTO에서 받은 역할 이름(문자열)을 MemberRole enum으로 변환하여 Member 엔티티에 추가
+            member.addRole(MemberRole.valueOf(roleName));
+        });
+
+        member.setDel(memberDTO.isDel()); // 탈퇴 여부 변경
+
+
+        // 관리자모드에서 수정에서 하지않고 직접 설정: 테스트용
+        //member.addRole(MemberRole.USER);// 권한 Role이 1개이상 경우 (List구조에 저장)
         //member.addRole(MemberRole.MANAGER);
         //member.addRole(MemberRole.ADMIN);
 
@@ -62,7 +77,7 @@ public interface MemberService {
                 member.isSocial(),
                 member.isDel(),
                 member.getMemberRolesList().stream().map(Enum::name).toList(),                          // 참조 메서드
-                // member.getMemberRolesList().stream().map(memberRole -> memberRole.name()).toList()
+                //member.getMemberRolesList().stream().map(memberRole -> memberRole.name()).toList(), // 람다식
                 member.getRegTime()
         );
     }

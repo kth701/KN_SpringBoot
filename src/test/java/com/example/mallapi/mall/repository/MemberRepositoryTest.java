@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,9 +37,18 @@ class MemberRepositoryTest {
                     .del(false)
                     .build();
 
+            // 회원 등록시 createdBy, modifiedBy 'anonymousUser'로 자동 초기화됨 -> 테스트용
+            //member.setCreatedBy("anonymousUser"); // 인위적으로 초기화 안됨
+            //member.setModifiedBy("anonymousUser");
+
+            //  날짜 초기값 설정
+            member.setRegTime(LocalDateTime.now());
+            member.setUpdateTime(LocalDateTime.now());
+
+            // role 초기값 설정
             member.addRole(MemberRole.USER);
 
-            if (i >= 3 && i <= 7) { // 5명
+            if (i >= 5 && i <= 7) { // 3명
                 member.addRole(MemberRole.MANAGER);
             }
 
