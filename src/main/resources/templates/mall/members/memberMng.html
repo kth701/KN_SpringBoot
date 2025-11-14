@@ -143,11 +143,22 @@
 
 
    // 조건 검색시 선택된 필터 조건 값
-    let searchDateType    = document.querySelector('#searchDateType').value;
+   /* 형식1
+    let searchDateType   = document.querySelector('#searchDateType').value;
     let searchBy          = document.querySelector('#searchBy').value;
-    let searchQuery       = document.querySelector('#searchQuery').value;
+    let searchQuery     = document.querySelector('#searchQuery').value;
     let socialType        = document.querySelector('#socialType').value;
-    let delFlag           = document.querySelector('#delFlag').value;
+    let delFlag             = document.querySelector('#delFlag').value;
+    */
+
+    /* 형식2 */
+    let searchDateType   = document.getElementById('searchDateType').value;
+    let searchBy          = document.getElementById('searchBy').value;
+    let searchQuery     = document.getElementById('searchQuery').value;
+    let socialType        = document.getElementById('socialType').value;
+    let delFlag             = document.getElementById('delFlag').value;
+
+
 
 
       // 검색창에서 엔터 키 입력 시 검색 실행

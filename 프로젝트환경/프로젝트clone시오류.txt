@@ -1,6 +1,6 @@
 
-
-G:\SpringStudy\jdk21_zulu\bin
+JDK 설치 경로
+참조> G:\SpringStudy\jdk21_zulu\bin
 
 
 

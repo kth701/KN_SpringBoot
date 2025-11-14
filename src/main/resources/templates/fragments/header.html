@@ -4,7 +4,7 @@
 
 <!-- Header -->
 <div th:fragment="navbar">
-    <header class="bg-white shadow-md sticky top-0 z-50">
+    <header class="bg-white shadow-md sticky top-0 z-50" >
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
                 <a href="#" class="text-3xl font-bold text-gray-900">ModernShop</a>
                 <div class="hidden md:flex items-center space-x-6">
@@ -14,11 +14,11 @@
                          class="text-gray-900 font-bold">상품등록</a>
                     <a href="/admin/items" th:href="@{/admin/items}" sec:authorize="hasAnyAuthority('ROLE_ADMIN')"
                         class="text-gray-600 hover:text-gray-900">상품관리</a>
-<!--                    <a href="/admin/items" th:href="@{/members}" sec:authorize="hasAnyAuthority('ROLE_ADMIN')"-->
-<!--                     class="text-gray-600 hover:text-gray-900">회원관리</a>-->
-                    <!-- 테스트용 -->
-                    <a href="/members"  th:href="@{/members}"
-                       class="text-gray-600 hover:text-gray-900">회원관리</a>
+                    <a href="/admin/items" th:href="@{/members}" sec:authorize="hasAnyAuthority('ROLE_ADMIN')"
+                     class="text-gray-600 hover:text-gray-900">회원관리</a>
+                     <!-- 테스트용 -->
+<!--                    <a href="/members"  th:href="@{/members}"-->
+<!--                       class="text-gray-600 hover:text-gray-900">회원관리</a>-->
 
                     <!-- 일반 회원  모드: MemberController에서 '현재 로그인 사용자' 와 '실제 접속자의 이메일' 동일 여부 판단하여 접근여부 판별 -->
                     <a  th:href="@{|/members/find/${#authentication.principal.username}|}" sec:authorize="isAuthenticated()"
@@ -53,6 +53,7 @@
 </div>
 
 
+
 <!-- Sidebar -->
 <div th:fragment="sidebar">
 
@@ -80,8 +81,5 @@
 
 </div>
 
-<div th:fragment="test2">
-    조각 모음3
-</div>
 
 </html>
